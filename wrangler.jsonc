@@ -1,6 +1,6 @@
 {
 	"main": "dist/_worker.js/index.js",
-	"name": "",
+  "name": "vamdigitalstudio",
   "compatibility_date": "2026-01-05",
   "compatibility_flags": [
     "nodejs_compat",
