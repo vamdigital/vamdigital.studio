@@ -47,6 +47,7 @@ a {
   flex-direction: column;
   max-width: var(--container-max-width);
   padding: var(--container-padding);
+  margin: 0 auto;
 }
 
 .large-title {
