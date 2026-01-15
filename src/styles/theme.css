@@ -1,13 +1,31 @@
 /* Theme for VAM Digital Studio */
+:root {
+  color-scheme: light dark;
+  /* light colors */
+  
+  --bg-color: #FAFAF9;
+  --link-color: #4A4A4A;
+  --heading-color: #1A1A1A;
+  --text-color: #595959;
+  --muted-color: #6B6B6B;
+}
 
 /* Light Mode */
-:root {
+:root[data-theme="light"] {
   /* light colors */
   --bg-color: #FAFAF9;
   --link-color: #4A4A4A;
   --heading-color: #1A1A1A;
   --text-color: #595959;
   --muted-color: #6B6B6B;
+}
+
+:root[data-theme="dark"] {
+--bg-color: #34322D;
+--link-color: #C9C8C5;
+--heading-color: #F8F8F7;
+--text-color: #B6B5B2;
+--muted-color: #AFAEAA;
 }
 
 /* Dark Mode */
