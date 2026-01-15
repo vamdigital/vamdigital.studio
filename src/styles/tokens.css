@@ -1,0 +1,19 @@
+/* Tokens that are generic */
+
+:root {
+  color-scheme: light dark;
+  --container-max-width: 1080px;
+  --container-padding: 1.5rem;
+  --content-max-width: 680px;
+  --content-padding: 1rem;
+  --content-gap: 28px;
+  --base-font-size: 16px;
+  --link-base-font-size: 0.9rem;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --large-heading-font-size: 48px;
+  --medium-heading-font-size: 36px;
+  --sub-heading-font-size: 16px;
+  --small-font-size: 14px;
+  --large-title-gap: 48px;
+}
+

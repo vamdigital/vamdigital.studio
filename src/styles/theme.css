@@ -2,39 +2,21 @@
 
 /* Light Mode */
 :root {
-  --container-max-width: 1080px;
-  --container-padding: 1.5rem;
-  --content-max-width: 680px;
-  --content-padding: 1rem;
-  --content-gap: 28px;
-  --base-font-size: 16px;
-  --link-base-font-size: 0.9rem;
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --large-heading-font-size: 48px;
-  --medium-heading-font-size: 36px;
-  --sub-heading-font-size: 16px;
-  --small-font-size: 14px;
-  --large-title-gap: 48px;
-
-
   /* light colors */
   --bg-color: #FAFAF9;
   --link-color: #4A4A4A;
   --heading-color: #1A1A1A;
-  /* --text-color: #7A7A7A; */
   --text-color: #595959;
-  --muted-color: rgba(0,0,0,0.3);
-
+  --muted-color: #6B6B6B;
 }
 
 /* Dark Mode */
 @media(prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
   --bg-color: #34322D;
   --link-color: #C9C8C5;
   --heading-color: #F8F8F7;
   --text-color: #B6B5B2;
-  /* --text-color: #858481; */
-  --muted-color: rgba(133,132,129,0.47);
+  --muted-color: #AFAEAA;
   }
 }
