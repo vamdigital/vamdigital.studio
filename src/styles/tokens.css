@@ -8,12 +8,13 @@
   --content-padding: 1rem;
   --content-gap: 28px;
   --base-font-size: 16px;
-  --link-base-font-size: 0.9rem;
+  --font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --link-base-font-size: 0.9rem;
   --large-heading-font-size: 48px;
   --medium-heading-font-size: 36px;
   --sub-heading-font-size: 16px;
   --small-font-size: 14px;
   --large-title-gap: 48px;
+  --page-title-gap-bottom: 66px;
 }
-
