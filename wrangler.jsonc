@@ -1,16 +1,28 @@
 {
-	"main": "dist/_worker.js/index.js",
+  "main": "dist/_worker.js/index.js",
   "name": "vamdigitalstudio",
   "compatibility_date": "2026-01-05",
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"
   ],
-	"assets": {
-		"binding": "ASSETS",
-		"directory": "./dist"
-	},
-	"observability": {
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist"
+  },
+  "observability": {
     "enabled": true
+  },
+
+  // --- staging environment ---
+  "env": {
+    "staging": {
+      "name": "vamdigitalstudio-staging",
+      "route": "staging.vamdigital.studio/*",
+      "workers_dev": false,
+      "vars": {
+        // any staging-specific variables
+      }
+    }
   }
 }
