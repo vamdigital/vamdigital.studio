@@ -16,19 +16,43 @@ function setAttributeValue(value: ToggleParams) {
   }
 }
 
+function getStoredTheme(): ToggleParams {
+  const stored = localStorage.getItem('theme') as ToggleParams
+  return stored && ['light', 'dark', 'system'].includes(stored) ? stored : 'system'
+}
+
+function setStoredTheme(value: ToggleParams) {
+  localStorage.setItem('theme', value)
+}
+
+function applyTheme() {
+  const theme = getStoredTheme()
+  setAttributeValue(theme)
+  const selectElement = document.querySelector('#theme-selector') as HTMLSelectElement
+  const iconElement = document.querySelector('#theme-icon') as HTMLSpanElement
+  if (selectElement) selectElement.value = theme
+  if (iconElement) iconElement.textContent = themeIcons[theme]
+}
+
 function toggleTheme() {
-  let selectElement = document.querySelector('#theme-selector') as HTMLSelectElement
-  let iconElement = document.querySelector('#theme-icon') as HTMLSpanElement
+  // Apply theme on page load (including initial and navigation)
+  document.addEventListener('astro:page-load', applyTheme)
+
+  // Also apply immediately in case the event has already fired
+  applyTheme()
+
+  const selectElement = document.querySelector('#theme-selector') as HTMLSelectElement
+  const iconElement = document.querySelector('#theme-icon') as HTMLSpanElement
+
   selectElement?.addEventListener("change", handleSelectChange)
-  iconElement.textContent = themeIcons["system"]
 
   function handleSelectChange(event: Event) {
     if (!(event.target instanceof HTMLSelectElement)) return; // safe guard
     const target = event.target
     const value = target.value as ToggleParams
     setAttributeValue(value)
-    iconElement.textContent = themeIcons[value]
-    themeIcons[value]
+    setStoredTheme(value)
+    if (iconElement) iconElement.textContent = themeIcons[value]
   }
 }
 
