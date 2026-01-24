@@ -86,7 +86,7 @@ a {
   &.active,
   &:hover {
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: 7px;
   }
 }
 
@@ -275,4 +275,40 @@ a {
 
 .page-title {
   padding-bottom: var(--page-title-gap-bottom);
+}
+
+/* Learning List */
+.learning-list {
+  display: flex;
+  align-items: center;
+}
+.learning-list__item {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0;
+  border-bottom: 1px solid var(--muted-color);
+}
+.learning-list__item-link {
+  display: flex;
+  cursor: pointer;
+}
+
+.learning-year {
+  font-weight: normal;
+  padding-top: 38px;
+}
+
+/* Learning post */
+.learning-wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+.back-link-bottom {
+  padding: 60px 0;
+  display: flex;
+  width: 30%;
+
 }

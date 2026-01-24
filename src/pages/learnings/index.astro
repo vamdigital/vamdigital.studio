@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/baseLayout.astro"
+import Learning from "../../components/learning.astro"
 import Title from '../../components/title.astro';
 ---
 
@@ -8,12 +9,13 @@ import Title from '../../components/title.astro';
     mainTitle="Learnings"
     subTitle="Thoughts on design, development, and everyday discoveries"
   />
-  <nav>
-    <ul>
-      <li><a href="learnings/learning-1">Why I'm keeping this site intentionally small</a></li>
-      <li><a href="learnings/learning-2"></a>My Second Post</li>
-      <li><a href="learnings/learning-3"></a>My Third Post</li>
-    </ul>
-  </nav>
-  <slot />
+  <h2 class="learning-year text-lg">2026</h2>
+  <Learning />
+  <Learning />
+  <Learning />
+  <h2 class="learning-year text-lg">2025</h2>
+  <Learning />
+  <Learning />
+  <Learning />
+  <Learning />
 </BaseLayout>

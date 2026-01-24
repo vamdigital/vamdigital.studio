@@ -1,0 +1,13 @@
+---
+import BaseLayout from './baseLayout.astro';
+---
+
+<BaseLayout>
+  <section class="learning-wrapper">
+      <div class="content-container">
+        <slot />
+    <a href="/learnings" class="text-xs link-color back-link-bottom">← Back to learnings</a>
+      </div>
+    <a href="/learnings" class="text-xs link-color">← Back to learnings</a>
+  </section>
+</BaseLayout>
