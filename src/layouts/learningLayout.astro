@@ -1,13 +1,34 @@
 ---
 import BaseLayout from './baseLayout.astro';
+const { frontmatter } = Astro.props;
+const slug = Astro.url.pathname.split("/").filter(Boolean).pop()
+const date = new Date(frontmatter.pubDate).toLocaleDateString('en-GB', {
+day: 'numeric', month: 'long', year: 'numeric'
+})
 ---
 
 <BaseLayout>
   <section class="learning-wrapper">
-      <div class="content-container">
-        <slot />
-    <a href="/learnings" class="text-xs link-color back-link-bottom">← Back to learnings</a>
+    <div class="content-container">
+
+      <h1
+        transition:name={`post-title-${slug}`}
+        style="font-size: clamp(28px, 5vw, 44px); line-height: 1.15;"
+      >
+        {frontmatter.title}
+      </h1>
+
+        <p class="muted-color text-sm">{date}</p>
+      <div class="post-tags">
+        {frontmatter.tags.map(tag =>
+          <span class={`post-tag post-tag--${tag.replace(/ /g, '-')}`}>{tag}</span>
+        )}
       </div>
+
+      <slot />
+
+      <a href="/learnings" class="text-xs link-color back-link-bottom">← Back to learnings</a>
+    </div>
     <a href="/learnings" class="text-xs link-color">← Back to learnings</a>
   </section>
 </BaseLayout>

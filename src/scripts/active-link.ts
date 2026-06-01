@@ -1,17 +1,19 @@
 function setActiveLink() {
-  const links = document.querySelectorAll('.nav-list a');
+  const links = document.querySelectorAll(".nav-list a");
   const currentPath = window.location.pathname;
-  links.forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('href') === currentPath) {
-      link.classList.add('active');
-    }
+
+  links.forEach((link) => {
+    link.classList.remove("active");
+    const href = link.getAttribute("href");
+    if (!href) return;
+
+    // Exact match for home, startsWith for everything else
+    const isActive =
+      href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+
+    if (isActive) link.classList.add("active");
   });
 }
 
-function initActiveLink() {
-  document.addEventListener('astro:page-load', setActiveLink);
-  setActiveLink(); // Run immediately in case the event has already fired
-}
-
-initActiveLink();
+document.addEventListener("astro:page-load", setActiveLink);
+setActiveLink();
