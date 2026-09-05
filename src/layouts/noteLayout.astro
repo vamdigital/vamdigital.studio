@@ -1,0 +1,66 @@
+---
+import BaseLayout from './baseLayout.astro';
+import { calculateReadingTime } from '../utils/reading-time';
+
+const { frontmatter } = Astro.props;
+const slug = Astro.url.pathname.split('/').filter(Boolean).pop();
+const date = new Date(frontmatter.pubDate).toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric'
+});
+const rawPosts = import.meta.glob<string>('../pages/notes/*.mdx', {
+  eager: true,
+  query: '?raw',
+  import: 'default'
+});
+const markdown = Object.entries(rawPosts).find(([path]) => path.endsWith(`/${slug}.mdx`))?.[1] ?? '';
+const readTime = calculateReadingTime(markdown);
+const tags = frontmatter.tags ?? [];
+---
+
+<BaseLayout title={`${frontmatter.title} — VAM Digital Studio`} description={frontmatter.description}>
+  <article class="article-page">
+    <header class="article-hero grid-frame">
+      <div class="article-hero__rail">
+        <a href="/notes" class="article-back" data-note-back>← Back to notes</a>
+        <div class="article-rail__meta">
+          <span class="eyebrow">{frontmatter.category ?? 'Note'}</span>
+          <dl>
+            <div><dt>Published</dt><dd>{date}</dd></div>
+            <div><dt>Reading time</dt><dd>{readTime}</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="article-hero__content">
+        <p class="eyebrow">Field note · {String(tags.length).padStart(2, '0')} topics</p>
+        <h1 transition:name={`post-title-${slug}`}>{frontmatter.title}</h1>
+        <p class="article-deck">{frontmatter.description}</p>
+      </div>
+    </header>
+
+    <div class="article-body grid-frame">
+      <aside class="article-sidebar">
+        <div class="article-sidebar__inner">
+          <div class="article-sidebar__section">
+            <p>Topics</p>
+            <div class="post-tags">
+              {tags.map(tag => <span class="post-tag">{tag}</span>)}
+            </div>
+          </div>
+          <p class="article-sidebar__note">Practical notes from designing, modernising, and testing frontend products.</p>
+        </div>
+      </aside>
+
+      <div class="article-content">
+        <slot />
+      </div>
+    </div>
+
+    <footer class="article-footer grid-frame">
+      <div><span class="eyebrow">Continue exploring</span><p>More notes on engineering thoughtful interfaces.</p></div>
+      <a href="/notes" class="button button-secondary" data-note-back>All notes <span aria-hidden="true">→</span></a>
+    </footer>
+  </article>
+</BaseLayout>

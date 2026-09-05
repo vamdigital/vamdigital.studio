@@ -1,0 +1,63 @@
+---
+title: "Writing Python decorators without losing type information"
+pubDate: 2026-05-14
+description: "A practical pattern for decorators that preserve arguments, return types, and useful function metadata."
+category: "Python"
+layout: ../../layouts/noteLayout.astro
+author: "Vaibhav Shringarpure"
+tags: ["Python", "Typing", "Decorators", "Pytest"]
+---
+
+Decorators are useful when several functions need the same behaviour, but a loosely typed wrapper can hide the signature of the function it protects. Python’s `ParamSpec`, `TypeVar`, and `functools.wraps` let us keep that information intact.
+
+## Preserve the complete signature
+
+`ParamSpec` captures every positional and keyword argument. `TypeVar` captures the return type, allowing the wrapper to expose the same callable contract as the original function.
+
+```python
+from collections.abc import Callable
+from functools import wraps
+from typing import ParamSpec, TypeVar
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def log_call(func: Callable[P, R]) -> Callable[P, R]:
+    """Log a call while preserving the wrapped function's signature."""
+
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@log_call
+def build_greeting(name: str, role: str = "engineer") -> str:
+    return f"Hello {name}, {role}"
+```
+
+Because the decorator is generic, an editor can still infer that `build_greeting()` accepts two strings and returns a string.
+
+## Test behaviour and metadata
+
+The test checks the returned value, the logging side effect, and the name preserved by `@wraps`.
+
+```python
+def test_log_call_preserves_the_function(capsys) -> None:
+    result = build_greeting("Vaibhav")
+
+    assert result == "Hello Vaibhav, engineer"
+    assert build_greeting.__name__ == "build_greeting"
+    assert capsys.readouterr().out == "Calling build_greeting\n"
+```
+
+Run the focused test while iterating:
+
+```bash
+pytest tests/test_decorators.py -q
+```
+
+The useful mental model is that the decorator adds behaviour around a call while keeping the original function’s public contract unchanged.

@@ -10,7 +10,7 @@ import Footer from "../components/footer.astro"
 
 const { 
   title = "VAM Digital Studio",
-  description = "Design-focused frontend engineering, experiments, learnings, and notes on building thoughtful digital interfaces."
+  description = "Design-focused frontend engineering, experiments, and notes on building thoughtful digital interfaces."
 } = Astro.props
 --- 
 <html lang="en">
@@ -28,10 +28,12 @@ const {
 	<body>
     <div class="container">
       <Header />
-    <main id="main-content">
-      <slot />
-    </main>
-    <Footer />
+      <main id="main-content">
+        <slot />
+      </main>
+      <Footer />
     </div>
+		<script src="../scripts/note-navigation.js"></script>
+		<script src="../scripts/code-blocks.js"></script>
 	</body>
 </html>

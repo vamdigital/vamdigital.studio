@@ -1,0 +1,27 @@
+---
+const {
+  slug,
+  number,
+  category,
+  date,
+  title,
+  description,
+  readTime
+} = Astro.props;
+---
+<article class="note-card">
+  <div class="note-card__meta">
+    <span>{category}</span>
+    <span>{number}</span>
+  </div>
+  <a href={`/notes/${slug}`} class="note-card__link link-color">
+    <div class="note-card__content">
+      <h2 transition:name={`post-title-${slug}`}>{title}</h2>
+      <p>{description}</p>
+    </div>
+    <div class="note-card__footer">
+      <span>{date} · {readTime}</span>
+      <span class="note-card__action">Read note <span aria-hidden="true">→</span></span>
+    </div>
+  </a>
+</article>

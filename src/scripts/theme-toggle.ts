@@ -1,11 +1,5 @@
 type ToggleParams = "light" | "dark" | "system";
 
-const themeIcons: Record<string, string> = {
-  light: "☀️",
-  dark: "🌙",
-  system: "🌗",
-};
-
 function setAttributeValue(value: ToggleParams) {
   const documentRoot = document.documentElement;
   if (value === "system") {
@@ -26,35 +20,41 @@ function setStoredTheme(value: ToggleParams) {
   localStorage.setItem("theme", value);
 }
 
-// Stable reference at module scope so removeEventListener can find it
-function handleSelectChange(event: Event) {
-  if (!(event.target instanceof HTMLSelectElement)) return;
-  const value = event.target.value as ToggleParams;
+function handleThemeClick(event: Event) {
+  const target = event.currentTarget;
+  if (!(target instanceof HTMLButtonElement)) return;
+
+  const value = target.dataset.themeValue as ToggleParams | undefined;
+  if (!value || !["light", "dark", "system"].includes(value)) return;
+
   setAttributeValue(value);
   setStoredTheme(value);
-  const iconElement = document.getElementById("theme-icon");
-  if (iconElement) iconElement.textContent = themeIcons[value];
+  updateSelectedOption(value);
+}
+
+function updateSelectedOption(theme: ToggleParams) {
+  document.querySelectorAll<HTMLButtonElement>("[data-theme-value]").forEach(
+    (button) => {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.themeValue === theme),
+      );
+    },
+  );
 }
 
 function applyTheme() {
   const theme = getStoredTheme();
   setAttributeValue(theme);
 
-  const selectElement = document.querySelector<HTMLSelectElement>(
-    "#theme-selector",
+  document.querySelectorAll<HTMLButtonElement>("[data-theme-value]").forEach(
+    (button) => {
+      // Prevent duplicate listeners after ClientRouter navigation.
+      button.removeEventListener("click", handleThemeClick);
+      button.addEventListener("click", handleThemeClick);
+    },
   );
-  const iconElement = document.querySelector<HTMLSpanElement>(
-    "#theme-icon",
-  );
-
-  if (selectElement) {
-    selectElement.value = theme;
-    // Remove before adding to prevent duplicate listeners on each navigation
-    selectElement.removeEventListener("change", handleSelectChange);
-    selectElement.addEventListener("change", handleSelectChange);
-  }
-
-  if (iconElement) iconElement.textContent = themeIcons[theme];
+  updateSelectedOption(theme);
 }
 
 // Re-runs applyTheme (and re-attaches the listener) on every ClientRouter navigation

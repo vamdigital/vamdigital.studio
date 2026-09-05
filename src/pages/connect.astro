@@ -3,10 +3,111 @@ import BaseLayout from "../layouts/baseLayout.astro";
 import Title from '../components/title.astro';
 ---
 
-	<BaseLayout>
+<BaseLayout title="Connect with me — VAM Digital Studio" description="Start a conversation with Vaibhav Shringarpure about frontend engineering work.">
+  <Title mainTitle="Connect with me" subTitle="Open to conversations, ideas, and thoughtful work." />
 
-  <Title
-    mainTitle="Connect with me"
-    subTitle="Open to conversations, ideas, and thoughtful work."
-  />
-	</BaseLayout>
+  <section class="connect-grid grid-frame">
+    <div class="connect-intro">
+      <p class="eyebrow"><span class="status-dot"></span>Open to Outside IR35 contracts</p>
+      <h2>Let’s make your frontend feel effortless.</h2>
+      <p>No lengthy brief needed. Share the basics here, or contact me directly.</p>
+      <div class="contact-methods">
+        <a class="contact-method" href="mailto:vibs.sh@gmail.com">
+          <span class="contact-method__label">Email</span>
+          <span class="contact-method__value">vibs.sh@gmail.com</span>
+          <span class="contact-method__arrow" aria-hidden="true">→</span>
+        </a>
+        <a class="contact-method" href="https://www.linkedin.com/in/vaibhavshringarpure" target="_blank" rel="noreferrer">
+          <span class="contact-method__label">LinkedIn</span>
+          <span class="contact-method__value">vaibhavshringarpure</span>
+          <span class="contact-method__arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value="3854a529-2aca-4d00-a351-08a5f7091f10" />
+      <input type="hidden" name="subject" value="New portfolio enquiry" />
+      <input type="hidden" name="from_name" value="VAM Digital Studio portfolio" />
+      <input class="botcheck" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" />
+      <div class="form-heading"><div><h2>Tell me a little about the project</h2><p>It should take less than a minute.</p></div><span>Quick enquiry</span></div>
+      <div class="field-grid">
+        <label class="form-field"><span>Your name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" required /></label>
+        <label class="form-field"><span>Email address</span><input type="email" name="email" autocomplete="email" placeholder="jane@company.com" required /></label>
+      </div>
+      <fieldset><legend>What can I help with?</legend><div class="choice-row">
+        {['Frontend build', 'Modernisation', 'Design systems', 'Something else'].map((option, index) => <button type="button" class:list={['project-choice', { 'is-selected': index === 0 }]} aria-pressed={index === 0} data-project-choice={option}>{option}</button>)}
+      </div></fieldset>
+      <input type="hidden" name="projectType" value="Frontend build" />
+      <label class="form-field"><span>A few details</span><textarea name="message" rows="4" placeholder="We need help with…" required></textarea></label>
+      <div class="form-actions">
+        <div class="form-feedback">
+          <p>Your details are used only to respond to this enquiry.</p>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </div>
+        <button class="form-submit" type="submit"><span class="form-submit__label">Send enquiry</span> <span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    function setupContactForm() {
+      const form = document.querySelector<HTMLFormElement>('#contact-form');
+      if (!form || form.dataset.ready === 'true') return;
+      form.dataset.ready = 'true';
+
+      const hiddenProject = form.querySelector<HTMLInputElement>('input[name="projectType"]');
+      const choices = form.querySelectorAll<HTMLButtonElement>('[data-project-choice]');
+      const submitButton = form.querySelector<HTMLButtonElement>('.form-submit');
+      const submitLabel = form.querySelector<HTMLElement>('.form-submit__label');
+      const status = form.querySelector<HTMLElement>('#form-status');
+      choices.forEach(choice => choice.addEventListener('click', () => {
+        choices.forEach(item => { item.classList.remove('is-selected'); item.setAttribute('aria-pressed', 'false'); });
+        choice.classList.add('is-selected');
+        choice.setAttribute('aria-pressed', 'true');
+        if (hiddenProject) hiddenProject.value = choice.dataset.projectChoice ?? 'Something else';
+      }));
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!submitButton || !submitLabel || !status) return;
+
+        submitButton.disabled = true;
+        form.setAttribute('aria-busy', 'true');
+        submitLabel.textContent = 'Sending…';
+        status.textContent = '';
+        status.removeAttribute('data-state');
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+          });
+          const result = await response.json() as { success?: boolean };
+
+          if (!response.ok || !result.success) throw new Error('Submission failed');
+
+          status.textContent = 'Thanks — your enquiry has been sent. I’ll be in touch soon.';
+          status.dataset.state = 'success';
+          form.reset();
+          choices.forEach((choice, index) => {
+            choice.classList.toggle('is-selected', index === 0);
+            choice.setAttribute('aria-pressed', String(index === 0));
+          });
+          if (hiddenProject) hiddenProject.value = 'Frontend build';
+        } catch {
+          status.textContent = 'That didn’t send. Please try again, or use the email link alongside the form.';
+          status.dataset.state = 'error';
+        } finally {
+          submitButton.disabled = false;
+          form.removeAttribute('aria-busy');
+          submitLabel.textContent = 'Send enquiry';
+        }
+      });
+    }
+
+    document.addEventListener('astro:page-load', setupContactForm);
+    setupContactForm();
+  </script>
+</BaseLayout>

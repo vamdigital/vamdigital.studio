@@ -1,44 +1,65 @@
 /* Theme for VAM Digital Studio */
 :root {
   color-scheme: light dark;
-  /* light colors */
-  
   --bg-color: #FAFAF9;
+  --surface-color: #F3F3EF;
+  --surface-raised: #FFFFFF;
   --link-color: #4A4A4A;
   --heading-color: #1A1A1A;
   --text-color: #595959;
   --muted-color: #6B6B6B;
-  --transparent-color: rgba(19, 19, 19, 100%);
+  --border-color: rgba(19, 19, 19, 0.16);
+  --transparent-color: rgba(19, 19, 19, 0.28);
+  --accent-color: #2D6240;
+  --accent-soft: #E6F0E7;
+  --on-accent: #FAFAF9;
 }
 
 /* Light Mode */
 :root[data-theme="light"] {
-  /* light colors */
   --bg-color: #FAFAF9;
+  --surface-color: #F3F3EF;
+  --surface-raised: #FFFFFF;
   --link-color: #4A4A4A;
   --heading-color: #1A1A1A;
   --text-color: #595959;
   --muted-color: #6B6B6B;
-  --transparent-color: rgba(19, 19, 19, 100%);
+  --border-color: rgba(19, 19, 19, 0.16);
+  --transparent-color: rgba(19, 19, 19, 0.28);
+  --accent-color: #2D6240;
+  --accent-soft: #E6F0E7;
+  --on-accent: #FAFAF9;
 }
 
 :root[data-theme="dark"] {
---bg-color: #34322D;
---link-color: #C9C8C5;
---heading-color: #F8F8F7;
---text-color: #B6B5B2;
---muted-color: #AFAEAA;
---transparent-color: rgba(255, 255, 255, 0.35);
+  --bg-color: #34322D;
+  --surface-color: #3D3B35;
+  --surface-raised: #45423C;
+  --link-color: #C9C8C5;
+  --heading-color: #F8F8F7;
+  --text-color: #B6B5B2;
+  --muted-color: #AFAEAA;
+  --border-color: rgba(255, 255, 255, 0.16);
+  --transparent-color: rgba(255, 255, 255, 0.35);
+  --accent-color: #BBD3B9;
+  --accent-soft: #465247;
+  --on-accent: #242D26;
 }
 
 /* Dark Mode */
 @media(prefers-color-scheme: dark) {
   :root:not([data-theme]) {
-  --bg-color: #34322D;
-  --link-color: #C9C8C5;
-  --heading-color: #F8F8F7;
-  --text-color: #B6B5B2;
-  --muted-color: #AFAEAA;
-  --transparent-color: rgba(255, 255, 255, 0.35);
+    --bg-color: #34322D;
+    --surface-color: #3D3B35;
+    --surface-raised: #45423C;
+    --link-color: #C9C8C5;
+    --heading-color: #F8F8F7;
+    --text-color: #B6B5B2;
+    --muted-color: #AFAEAA;
+    --border-color: rgba(255, 255, 255, 0.16);
+    --transparent-color: rgba(255, 255, 255, 0.35);
+    --accent-color: #BBD3B9;
+    --accent-soft: #465247;
+    --on-accent: #242D26;
   }
 }

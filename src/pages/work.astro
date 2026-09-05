@@ -1,11 +1,99 @@
 ---
 import BaseLayout from '../layouts/baseLayout.astro';
 import Title from '../components/title.astro';
+
+const projects = [
+  {
+    number: '01',
+    title: 'Enterprise Search Experience',
+    summary: 'Making a complex search journey feel focused, predictable, and useful across large file datasets.',
+    challenge: 'Bring search into an established product while supporting advanced filters, large result sets, and existing file actions.',
+    contribution: 'Led the frontend delivery across routing, search controls, result tables, inline actions, sorting, loading states, and cursor-based pagination.',
+    outcome: 'A cohesive and extensible search experience with clearer feedback, dependable navigation, and actions available where users need them.',
+    detail: 'Search / product delivery',
+    disclosure: 'Anonymised',
+    tags: ['React', 'TypeScript', 'React Router'],
+    tone: 'green'
+  },
+  {
+    number: '02',
+    title: 'Frontend Modernisation',
+    summary: 'Creating a safer foundation for an established frontend without pausing ongoing product delivery.',
+    challenge: 'Modernise a legacy toolchain and codebase incrementally while teams continued to build and release product features.',
+    contribution: 'Introduced TypeScript, clearer folder boundaries, ESLint and Prettier, migrated builds to Vite, and established Storybook with automated delivery.',
+    outcome: 'A more maintainable engineering foundation with stronger conventions, reusable UI documentation, and quicker development feedback.',
+    detail: 'Architecture / platform',
+    disclosure: 'Anonymised',
+    tags: ['TypeScript', 'Vite', 'Storybook', 'Vitest'],
+    tone: 'violet'
+  },
+  {
+    number: '03',
+    title: 'Secure Sharing Workflows',
+    summary: 'Adding stronger recipient protection while keeping a sensitive sharing journey understandable.',
+    challenge: 'Introduce email-recipient controls and one-time-password protection without making an existing sharing workflow feel cumbersome.',
+    contribution: 'Built the React interactions and connected them with Python services, backend validation, session behaviour, and Jinja email templates.',
+    outcome: 'A coherent end-to-end workflow with explicit validation, understandable security states, and clear guidance for recipients.',
+    detail: 'Security / full-stack',
+    disclosure: 'Anonymised',
+    tags: ['React', 'Python', 'Jinja'],
+    tone: 'amber'
+  },
+  {
+    number: '04',
+    title: 'Dual-brand Checkout & Payments',
+    summary: 'Improving critical purchase journeys across Calvin Klein and Tommy Hilfiger while supporting controlled releases across markets.',
+    challenge: 'Evolve checkout across two global brands without fragmenting the shared architecture or disrupting ongoing regional delivery.',
+    contribution: 'Led basket and shipping-method features, implemented Apple Pay and PayPal Express, and used Optimizely feature flags to validate releases.',
+    outcome: 'Expanded payment choice, strengthened shared dual-brand delivery, and enabled features to be evaluated before wider market rollout.',
+    detail: 'Commerce / checkout',
+    disclosure: 'Named client work',
+    tags: ['Next.js', 'TypeScript', 'Apple Pay', 'PayPal'],
+    tone: 'blue'
+  }
+];
+
+const experience = [
+  { period: 'Jan 2025—Present', role: 'Senior Frontend Engineer', company: 'Nasuni', context: 'Enterprise file data platform', summary: 'Leading frontend modernisation while delivering search, secure sharing, upload workflows, accessibility, and automated quality.', tags: ['React', 'TypeScript', 'Vite', 'Storybook', 'Python', 'Pytest', 'Selenium'] },
+  { period: 'Jun 2019—Jan 2025', role: 'Senior Frontend Engineer', company: 'VML · WPP Group', context: 'Calvin Klein & Tommy Hilfiger', summary: 'Helped decouple a Java monolith, built a shared white-label component library, and led checkout and payment improvements.', tags: ['React', 'TypeScript', 'Next.js', 'Storybook', 'Cypress'] },
+  { period: 'Jul 2018—Jun 2019', role: 'Senior Frontend Engineer', company: 'Jellyfish', context: 'London', summary: 'Owned a React component library, replaced legacy jQuery architecture, and established coding and testing standards.', tags: ['React', 'Next.js', 'Node.js', 'Docker', 'Tailwind CSS'] },
+  { period: 'May 2012—Jul 2018', role: 'UI/UX Engineer', company: 'Open Health', context: 'Sanofi · GSK · Novartis', summary: 'Delivered responsive experiences across design, implementation, client liaison, and the full project lifecycle.', tags: ['JavaScript', 'jQuery', 'Handlebars', '.NET', 'Umbraco'] }
+];
 ---
 
-<BaseLayout>
-  <Title
-    mainTitle="Work"
-    subTitle="Things I’ve built, designed, or explored"
-  />
+<BaseLayout title="Work — VAM Digital Studio" description="Selected frontend product work and delivery experience by Vaibhav Shringarpure.">
+  <Title mainTitle="Work" subTitle="Anonymised case studies from enterprise product work, followed by the experience behind them." />
+
+  <section class="project-grid grid-frame" aria-label="Selected anonymised case studies">
+    {projects.map(project => (
+      <article class="project-card">
+        <div class={`project-visual project-visual--${project.tone}`}>
+          <div class="project-window" aria-hidden="true"><span class="window-bar"></span><span class="window-line window-line--short"></span><span class="window-line"></span><span class="window-grid"><i></i><i></i><i></i></span></div>
+          <span class="project-disclosure">{project.disclosure}</span>
+          <span class="project-detail">{project.detail}</span>
+        </div>
+        <div class="project-content">
+          <span class="path-number">Case study · {project.number}</span>
+          <h2>{project.title}</h2>
+          <p class="project-summary">{project.summary}</p>
+          <dl class="case-study-breakdown">
+            <div><dt>Challenge</dt><dd>{project.challenge}</dd></div>
+            <div><dt>Contribution</dt><dd>{project.contribution}</dd></div>
+            <div><dt>Outcome</dt><dd>{project.outcome}</dd></div>
+          </dl>
+          <div class="tag-row">{project.tags.map(tag => <span class="tag">{tag}</span>)}</div>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <section class="experience-section">
+    <div class="section-intro"><p class="eyebrow">Experience</p><h2>Complex products.<br /><em>Practical delivery.</em></h2><p>From hands-on UI delivery to frontend architecture, I help teams modernise established products and ship confidently.</p></div>
+    <div class="proof-grid grid-frame"><div><strong>10+</strong><span>Years building for the web</span></div><div><strong>Global</strong><span>Consumer and healthcare brands</span></div><div><strong>End-to-end</strong><span>Discovery through production</span></div></div>
+    <div class="experience-list">
+      {experience.map(item => (
+        <article class="experience-row"><p class="experience-period">{item.period}</p><div><h3>{item.role}</h3><p class="experience-company">{item.company}</p><p class="text-xs muted-color">{item.context}</p></div><div><p>{item.summary}</p><div class="tag-row">{item.tags.map(tag => <span class="tag">{tag}</span>)}</div></div></article>
+      ))}
+    </div>
+  </section>
 </BaseLayout>

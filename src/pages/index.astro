@@ -1,18 +1,53 @@
 ---
 import BaseLayout from "../layouts/baseLayout.astro"
 ---
-<BaseLayout>
-	<div class="content-container">
-		<h1 class="large-title large-title-gap">Hello, I'm Vaibhav</h1>
-		<p class="content">I design and build thoughtful web interfaces, with a background in UI/UX design and over two decades of experience building for the web.</p>
 
-		<p class="content">Today, I work primarily as a senior frontend engineer, focusing on clarity, craft, and maintainable systems.</p>
+<BaseLayout
+  title="Vaibhav Shringarpure — Senior Frontend Engineer"
+  description="Senior frontend engineer specialising in React, TypeScript, frontend modernisation, and thoughtful product experiences."
+>
+  <section class="home-hero grid-frame">
+    <div class="home-intro">
+      <p class="eyebrow"><span class="status-dot"></span>Available for select contract roles</p>
+      <h1 class="home-title">Hello, I'm Vaibhav</h1>
+      <p class="home-lead">I build thoughtful web interfaces and make complex products feel effortless.</p>
+      <p class="home-copy">Senior Frontend Engineer specialising in React and TypeScript, with a background in UI/UX design and a focus on clarity, craft, and maintainable systems.</p>
+      <div class="button-row">
+        <a class="button button-primary" href="/work">Explore my work <span aria-hidden="true">→</span></a>
+        <a class="button button-secondary" href="/connect">Let's talk</a>
+      </div>
+    </div>
 
-		<p class="content">This site is a home for my work, writing, and quiet explorations.</p>
+    <aside class="home-aside">
+      <div class="orbit-panel" aria-hidden="true">
+        <span class="orbit orbit-small"></span>
+        <span class="orbit orbit-medium"></span>
+        <span class="orbit orbit-large"></span>
+        <span class="orbit-label orbit-label--system">System</span>
+        <span class="orbit-label orbit-label--interaction">Interaction</span>
+        <span class="orbit-label orbit-label--person">Person</span>
+        <span class="orbit-mark">&lt;/&gt;</span>
+      </div>
+      <p class="home-aside-note">
+        <span class="home-aside-note__label">Working principle</span>
+        <span>Engineering with equal care for the system, the interaction, and the person using it.</span>
+      </p>
+      <div class="home-metric">
+        <span class="home-metric__label">Practice</span>
+        <strong>Senior</strong>
+        <span class="home-metric__detail">Frontend product engineering</span>
+      </div>
+      <div class="home-metric">
+        <span class="home-metric__label">Location</span>
+        <strong>UK</strong>
+        <span class="home-metric__detail">Based · working globally</span>
+      </div>
+    </aside>
+  </section>
 
-		<p class="small-content">
-			Writing and building here as VAM.
-		</p>
-	
-	</div>
+  <section class="home-paths grid-frame">
+    <a class="path-card" href="/work"><span class="path-number">01</span><h2>Work</h2><p>Selected product work, frontend architecture, and professional experience.</p><span class="path-arrow" aria-hidden="true">↗</span></a>
+    <a class="path-card" href="/notes"><span class="path-number">02</span><h2>Notes</h2><p>Thoughts on design, development, and the everyday discoveries behind the work.</p><span class="path-arrow" aria-hidden="true">↗</span></a>
+    <a class="path-card" href="/about"><span class="path-number">03</span><h2>About me</h2><p>How design, engineering, and independent delivery come together in my practice.</p><span class="path-arrow" aria-hidden="true">↗</span></a>
+  </section>
 </BaseLayout>

@@ -2,19 +2,34 @@
 
 :root {
   color-scheme: light dark;
-  --container-max-width: 1080px;
-  --container-padding: 1.5rem;
-  --content-max-width: 680px;
+  --container-max-width: 1360px;
+  --container-padding: clamp(1rem, 3vw, 2rem);
+  --content-max-width: 760px;
   --content-padding: 1rem;
   --content-gap: 28px;
-  --base-font-size: 16px;
+  --base-font-size: clamp(1rem, 0.97rem + 0.16vw, 1.1rem);
   --font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --link-base-font-size: 0.9rem;
-  --large-heading-font-size: 48px;
-  --medium-heading-font-size: 36px;
-  --sub-heading-font-size: 16px;
-  --small-font-size: 14px;
+  --font-size-xs: clamp(0.75rem, 0.73rem + 0.1vw, 0.81rem);
+  --font-size-sm: clamp(0.875rem, 0.84rem + 0.18vw, 0.97rem);
+  --font-size-body: var(--base-font-size);
+  --font-size-subtitle: clamp(1.05rem, 1.01rem + 0.2vw, 1.18rem);
+  --font-size-lead: clamp(1.18rem, 1.1rem + 0.4vw, 1.42rem);
+  --font-size-h3: clamp(1.38rem, 1.26rem + 0.6vw, 1.72rem);
+  --font-size-h2: clamp(1.72rem, 1.48rem + 1.2vw, 2.45rem);
+  --font-size-h1: clamp(2.35rem, 1.75rem + 3vw, 4.6rem);
+  --font-size-display: clamp(3.2rem, 2.15rem + 5.25vw, 6.25rem);
+  --leading-display: 1.08;
+  --leading-heading: 1.18;
+  --leading-body: 1.72;
+  --leading-prose: 1.82;
+  --tracking-display: -0.028em;
+  --tracking-heading: -0.018em;
+  --link-base-font-size: var(--font-size-sm);
+  --large-heading-font-size: var(--font-size-display);
+  --medium-heading-font-size: var(--font-size-h2);
+  --sub-heading-font-size: var(--font-size-lead);
+  --small-font-size: var(--font-size-sm);
   --large-title-gap: 48px;
   --page-title-gap-bottom: 66px;
 }

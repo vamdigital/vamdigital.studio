@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../../layouts/baseLayout.astro"
+import Note from "../../components/note.astro"
+import Title from '../../components/title.astro';
+import { calculateReadingTime } from '../../utils/reading-time';
+
+interface NoteFrontmatter {
+  title: string;
+  pubDate: string | Date;
+  description: string;
+  category?: string;
+}
+
+interface NoteModule {
+  frontmatter: NoteFrontmatter;
+}
+
+const modules = import.meta.glob<NoteModule>('./*.mdx', { eager: true });
+const rawPosts = import.meta.glob<string>('./*.mdx', {
+  eager: true,
+  query: '?raw',
+  import: 'default'
+});
+
+const posts = Object.entries(modules)
+  .map(([path, module]) => {
+    const published = new Date(module.frontmatter.pubDate);
+    const markdown = rawPosts[path] ?? '';
+
+    return {
+      slug: path.split('/').pop()?.replace('.mdx', '') ?? '',
+      category: module.frontmatter.category ?? 'Note',
+      date: published.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }),
+      title: module.frontmatter.title,
+      description: module.frontmatter.description,
+      readTime: calculateReadingTime(markdown),
+      published
+    };
+  })
+  .sort((a, b) => b.published.getTime() - a.published.getTime())
+  .map((post, index) => ({
+    ...post,
+    number: String(index + 1).padStart(2, '0')
+  }));
+---
+
+<BaseLayout title="Notes — VAM Digital Studio" description="Notes on frontend engineering, design, and building for the web.">
+  <Title
+    mainTitle="Notes on building for the web."
+    subTitle="Thoughts on design, frontend architecture, product engineering, testing, and the everyday discoveries behind interfaces that last."
+  />
+  <section class="notes-frame grid-frame" aria-label="Published notes">
+    {posts.map(post => <Note {...post} />)}
+  </section>
+</BaseLayout>

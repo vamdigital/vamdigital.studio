@@ -1,0 +1,97 @@
+---
+title: "Keeping React search states predictable with TypeScript"
+pubDate: 2026-06-03
+description: "Using a discriminated union and a small debounce hook to make loading, success, empty, and error states explicit."
+category: "React and TypeScript"
+layout: ../../layouts/noteLayout.astro
+author: "Vaibhav Shringarpure"
+tags: ["React", "TypeScript", "Product UI", "CSS"]
+---
+
+Search interfaces often become difficult to reason about because several booleans can describe impossible combinations. A discriminated union gives the component one valid state at a time and makes every branch visible to TypeScript.
+
+## Model the states before the markup
+
+The `status` field determines which other values are available. A successful state has results; an error state has a message; neither can accidentally pretend to be loading.
+
+```tsx
+type SearchResult = {
+  id: string;
+  name: string;
+  location: string;
+};
+
+type SearchState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; results: SearchResult[] }
+  | { status: "error"; message: string };
+
+type SearchResultsProps = {
+  state: SearchState;
+};
+
+export function SearchResults({ state }: SearchResultsProps) {
+  switch (state.status) {
+    case "idle":
+      return <p>Enter a term to start searching.</p>;
+    case "loading":
+      return <p aria-live="polite">Searching…</p>;
+    case "error":
+      return <p role="alert">{state.message}</p>;
+    case "success":
+      return state.results.length > 0 ? (
+        <ul>
+          {state.results.map(result => (
+            <li key={result.id}>{result.name}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No matching results.</p>
+      );
+  }
+}
+```
+
+Adding another state now produces a compiler warning until the component handles it.
+
+## Keep input responsive
+
+A generic debounce hook delays the value used for the request without delaying what the user sees in the input.
+
+```typescript
+import { useEffect, useState } from "react";
+
+export function useDebouncedValue<T>(value: T, delay = 250): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+```
+
+## Make keyboard focus obvious
+
+Small interaction details belong to the component contract too. `:focus-visible` provides a clear keyboard indicator without showing a ring for every pointer click.
+
+```css
+.search-result:focus-visible {
+  outline: 2px solid #2d6240;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-result {
+    transition: none;
+  }
+}
+```
+
+Explicit states, responsive input, and visible focus make the interface easier to maintain and more dependable for the person using it.

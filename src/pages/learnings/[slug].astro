@@ -1,0 +1,20 @@
+---
+const noteModules = import.meta.glob('../notes/*.mdx');
+
+export function getStaticPaths() {
+  return Object.keys(noteModules).map(path => {
+    const noteSlug = path.split('/').pop()?.replace('.mdx', '') ?? '';
+    const legacySlug = noteSlug === 'keeping-this-site-intentionally-small'
+      ? 'learning-1'
+      : noteSlug;
+
+    return {
+      params: { slug: legacySlug },
+      props: { destination: `/notes/${noteSlug}` }
+    };
+  });
+}
+
+const { destination } = Astro.props;
+return Astro.redirect(destination, 301);
+---
