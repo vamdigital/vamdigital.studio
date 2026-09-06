@@ -3,6 +3,9 @@ import BaseLayout from './baseLayout.astro';
 import { calculateReadingTime } from '../utils/reading-time';
 
 const { frontmatter } = Astro.props;
+if(frontmatter.draft == true && import.meta.env.PROD) {
+  return Astro.redirect('/notes', 302);
+}
 const slug = Astro.url.pathname.split('/').filter(Boolean).pop();
 const date = new Date(frontmatter.pubDate).toLocaleDateString('en-GB', {
   day: 'numeric',

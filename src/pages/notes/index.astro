@@ -9,6 +9,7 @@ interface NoteFrontmatter {
   pubDate: string | Date;
   description: string;
   category?: string;
+  draft?: boolean;
 }
 
 interface NoteModule {
@@ -34,9 +35,11 @@ const posts = Object.entries(modules)
       title: module.frontmatter.title,
       description: module.frontmatter.description,
       readTime: calculateReadingTime(markdown),
+      draft: module.frontmatter.draft ?? false,
       published
     };
   })
+  .filter(post => import.meta.env.DEV || !post.draft)
   .sort((a, b) => b.published.getTime() - a.published.getTime())
   .map((post, index) => ({
     ...post,
