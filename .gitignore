@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # Notes
 NOTES.md
+
+# Wrangler
+.wrangler/
