@@ -1,0 +1,138 @@
+---
+title: 'Signing in to Codex CLI on a remote machine'
+pubDate: 2026-05-13
+description: 'How to authenticate Codex CLI on a remote or headless machine using device-code login or an SSH port-forwarding fallback.'
+category: 'AI and Developer Tools'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+tags:
+  - Codex CLI
+  - SSH
+  - Authentication
+  - Developer Tooling
+---
+
+Signing in to Codex CLI is straightforward when the command runs on a machine with a browser. It becomes slightly less obvious when Codex is running on a remote server accessed over SSH.
+
+The normal browser flow sends the authentication result to a callback server on `localhost`. If the CLI is running remotely but the browser opens locally, those two references to `localhost` point to different machines.
+
+There are two ways to handle this: use device-code authentication or forward the callback port over SSH.
+
+## Check the current login
+
+Before signing in again, check which authentication method Codex is currently using:
+
+```bash
+codex login status
+```
+
+If I need to change accounts or replace the stored session, I log out first:
+
+```bash
+codex logout
+```
+
+Logging out is optional when there is no existing session.
+
+## Prefer device-code authentication
+
+For remote and headless environments, the simplest option is device-code authentication:
+
+```bash
+codex login --device-auth
+```
+
+Codex displays a web address and a one-time code. Open the address in a browser on the local machine, sign in to the appropriate ChatGPT account or workspace, and enter the code.
+
+This avoids relying on a localhost callback reaching the remote terminal.
+
+Device-code authentication is currently a beta feature and may need to be enabled in the ChatGPT account's security settings. For a managed workspace, an administrator may need to allow it in the workspace permissions.
+
+If the option is unavailable, the SSH port-forwarding method provides a useful fallback.
+
+## Forward the login callback over SSH
+
+Codex's browser-based login flow uses `localhost:1455` as its default callback address.
+
+From the local machine, open the SSH connection with port forwarding enabled:
+
+```bash
+ssh -L 1455:localhost:1455 user@your-remote-machine
+```
+
+This command creates a tunnel between port `1455` on the local machine and port `1455` on the remote machine.
+
+Keep this SSH session open for the rest of the login process.
+
+## Start the login on the remote machine
+
+Inside the forwarded SSH session, run:
+
+```bash
+codex login
+```
+
+Choose the option to sign in with ChatGPT. Codex will print an authentication URL in the terminal.
+
+Copy that URL and open it in a browser on the local machine.
+
+## Complete authentication in the browser
+
+Sign in using the account associated with the required ChatGPT workspace. If the organisation uses single sign-on, complete its normal SSO and multi-factor authentication steps.
+
+At the end of the browser flow, the page redirects to an address using `localhost:1455`.
+
+Without port forwarding, that callback would remain on the local machine and never reach the Codex process running remotely. The SSH tunnel forwards it to port `1455` on the remote machine, allowing the CLI to complete the login.
+
+After the browser confirms that authentication succeeded, return to the terminal. Codex should now be ready to use.
+
+## The complete SSH workflow
+
+The complete fallback sequence is:
+
+```bash
+# Run this on the local machine.
+ssh -L 1455:localhost:1455 user@your-remote-machine
+
+# Run these commands inside the resulting SSH session.
+codex logout
+codex login
+```
+
+Then open the URL printed by `codex login` in the local browser and complete the sign-in process.
+
+## If the login does not complete
+
+A few things are worth checking:
+
+- Make sure `codex login` was run inside the SSH session that has port forwarding enabled.
+- Keep that SSH session open until the browser authentication has completed.
+- Check that another local process is not already using port `1455`.
+- Try device-code authentication with `codex login --device-auth`.
+- Run `codex login status` afterwards to confirm that Codex stored the new session.
+
+Codex also writes a dedicated login log that can help diagnose browser and device-code authentication failures. Its location depends on the configured Codex log directory.
+
+## Keep authentication details private
+
+Codex may store its authentication cache in `~/.codex/auth.json`, depending on the configured credential-storage method.
+
+That file contains access tokens and should be treated like a password. It should never be committed to Git, pasted into a support ticket or shared in a chat.
+
+The URLs and one-time codes shown during authentication should also only be used for the intended login session.
+
+## Choosing between the two methods
+
+For a remote machine, I now start with device-code authentication:
+
+```bash
+codex login --device-auth
+```
+
+When that option is not available, forwarding port `1455` over SSH allows the standard browser login to work reliably:
+
+```bash
+ssh -L 1455:localhost:1455 user@your-remote-machine
+```
+
+The key is understanding where the callback needs to go. The browser runs locally, the Codex CLI runs remotely, and the SSH tunnel connects the two.

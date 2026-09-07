@@ -1,0 +1,238 @@
+---
+title: 'What is a Product Requirements Document?'
+pubDate: 2025-08-07
+description: 'A practical introduction to what a Product Requirements Document contains, why it matters, and how teams use it throughout product development.'
+category: 'Product Engineering'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+tags:
+  - Product Requirements
+  - PRD
+  - Product Development
+  - Collaboration
+---
+
+A Product Requirements Document, usually shortened to PRD, describes the product or feature a team intends to build.
+
+It brings the problem, users, expected behaviour, scope and measures of success into one place. This gives product, design, engineering and QA a shared understanding before implementation begins.
+
+A PRD does not need to provide every technical detail. Its main purpose is to explain what needs to be built and why it matters.
+
+## What does a PRD define?
+
+A PRD describes the expected features, functionality and constraints of a product or feature.
+
+It should help the team answer questions such as:
+
+- What problem are we solving?
+- Who are we solving it for?
+- What should the product allow them to do?
+- What behaviour is required?
+- What is included in the initial scope?
+- What is deliberately excluded?
+- How will we know whether the result is successful?
+
+The document should contain enough detail for the team to make informed decisions without prescribing every aspect of the implementation.
+
+## What does a PRD contain?
+
+The exact structure varies between teams and projects, but a useful PRD commonly includes the following sections.
+
+### Product overview
+
+The overview gives the reader a concise explanation of the proposed product or feature.
+
+It should describe:
+
+- The problem being addressed
+- The people affected by the problem
+- The proposed outcome
+- Why the work matters
+
+Someone unfamiliar with the project should be able to read this section and understand its purpose.
+
+### Goals and non-goals
+
+Goals define what the work is expected to achieve.
+
+Non-goals are equally useful because they explain what the team is not attempting to solve in the current piece of work.
+
+Making both explicit helps prevent assumptions from quietly expanding the scope.
+
+### User stories or use cases
+
+User stories describe the requirement from the user's perspective.
+
+A common format is:
+
+> As a user, I want to perform an action so that I can achieve an outcome.
+
+For example:
+
+> As a returning customer, I want to view my previous orders so that I can find something I purchased earlier.
+
+Use cases can provide more detail by describing the steps a person takes, the system's expected response and any alternative or failure paths.
+
+### Functional requirements
+
+Functional requirements describe what the product must do.
+
+For an order-history feature, they might include requirements such as:
+
+- Display the customer's previous orders
+- Sort orders with the most recent first
+- Allow the customer to open an individual order
+- Show an appropriate empty state when no orders exist
+
+These requirements describe observable behaviour without necessarily deciding how the engineering team must implement it.
+
+### Non-functional requirements
+
+Non-functional requirements describe qualities and constraints surrounding the feature.
+
+These can include:
+
+- Accessibility expectations
+- Performance requirements
+- Browser or device support
+- Security and privacy constraints
+- Reliability expectations
+- Localisation requirements
+
+A feature can satisfy its functional requirements and still provide a poor experience if these wider qualities are ignored.
+
+### Assumptions and constraints
+
+Assumptions record things the team currently believes to be true.
+
+Constraints describe boundaries within which the solution must operate, such as an existing API, a supported browser range or a delivery dependency.
+
+Writing these down makes uncertainty visible. It also gives the team something specific to revisit when new information appears.
+
+### Success metrics
+
+Success metrics explain how the team will evaluate the outcome.
+
+The appropriate measures depend on the feature. They could relate to task completion, adoption, reliability, performance or another observable result.
+
+Metrics should connect to the original problem rather than simply measuring whether the feature was delivered.
+
+## Why is a PRD important?
+
+A PRD creates a shared reference for the people involved in delivering a product.
+
+### It creates clarity
+
+Product, design, engineering and QA can interpret the same idea differently. A written description exposes those differences early, while they are still easier to discuss.
+
+### It supports planning
+
+Clear requirements help the team identify dependencies, estimate effort, divide the work and decide what should be prioritised.
+
+An estimate may still change as the team learns more, but it begins from a better-defined understanding of the work.
+
+### It provides a reference point
+
+During design, development and testing, the team can return to the PRD when questions arise.
+
+This does not mean that the document replaces conversation. It gives those conversations a shared starting point and records the decisions that follow.
+
+### It helps manage scope
+
+A PRD makes the agreed scope visible. When a new request appears, the team can decide whether it belongs in the current work, should replace something else or should be considered separately.
+
+The aim is not to freeze every requirement permanently. It is to make changes deliberate rather than accidental.
+
+### It improves cross-functional communication
+
+A PRD is particularly valuable when work moves between different roles, teams or locations.
+
+It helps everyone understand the same problem and expected outcome without depending entirely on information passed through meetings or private conversations.
+
+## When is a PRD used?
+
+A PRD remains useful throughout the product-development lifecycle.
+
+### Before development
+
+The document is normally created during discovery or planning, once the problem is understood well enough to consider a solution.
+
+At this stage, it helps the team:
+
+- Agree on the problem
+- Define the intended outcome
+- Explore the scope
+- Identify unanswered questions
+- Decide whether the work is ready to begin
+
+The document does not need to be perfect before anyone can discuss it. Writing it often reveals the areas that still need investigation.
+
+### During design and development
+
+The PRD becomes a reference while designers explore the interaction and engineers decide how to implement it.
+
+New information may require a requirement to be clarified or changed. When that happens, the PRD should be updated so that it continues to reflect the team's current agreement.
+
+This makes it a living document rather than a snapshot that becomes outdated as soon as development starts.
+
+### During testing
+
+QA and engineering can use the requirements to identify expected behaviour, important scenarios and failure cases.
+
+The PRD does not replace detailed test plans or acceptance criteria, but it provides the product context behind them.
+
+### After launch
+
+After release, the team can compare the delivered outcome with the original goals and success measures.
+
+This helps answer two separate questions:
+
+- Did we build what we intended to build?
+- Did it solve the problem we intended to solve?
+
+Delivering every listed requirement does not automatically mean the product was successful. The outcome still needs to be evaluated.
+
+## A lightweight PRD structure
+
+A PRD does not have to become a large document. A smaller feature may only need a concise structure:
+
+```text
+Title
+
+Problem
+What problem are we trying to solve?
+
+Users
+Who experiences this problem?
+
+Goals
+What outcome should this work achieve?
+
+Non-goals
+What is outside the current scope?
+
+User stories
+What should users be able to do?
+
+Requirements
+How should the feature behave?
+
+Constraints and assumptions
+What boundaries or uncertainties should the team know about?
+
+Success measures
+How will we evaluate the result?
+
+Open questions
+What still needs to be decided?
+```
+
+The amount of detail should be proportional to the size, risk and uncertainty of the work.
+
+## A shared understanding, not just a document
+
+The value of a PRD does not come from completing a template. It comes from the conversations and decisions that the document captures.
+
+A useful PRD gives the team a shared understanding of the problem, the intended outcome and the boundaries of the work. It provides direction without trying to replace design exploration, technical planning or ongoing collaboration.
+
+When treated as a living reference, it helps a team move from an idea to implementation with fewer assumptions and clearer decisions.

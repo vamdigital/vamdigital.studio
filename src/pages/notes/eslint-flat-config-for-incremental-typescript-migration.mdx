@@ -1,0 +1,742 @@
+---
+title: 'An ESLint flat config for incremental TypeScript migration'
+pubDate: 2025-07-28
+description: 'How I configure ESLint for a mixed JavaScript, TypeScript and React codebase while gradually tightening its rules.'
+category: 'Developer Tooling'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+tags:
+  - ESLint
+  - TypeScript
+  - React
+  - Code Quality
+---
+
+Introducing TypeScript into an existing JavaScript application is rarely an all-at-once change. For a while, JavaScript, TypeScript, JSX and TSX files may all need to live in the same codebase.
+
+My ESLint configuration reflects that reality. It gives each file type the appropriate parser and rules, catches useful problems without making the migration unmanageable, and leaves formatting decisions to Prettier.
+
+The important part is not enabling every possible rule. It is creating a configuration that can become stricter as the codebase improves.
+
+## Start with recommended rule sets
+
+Rather than defining every rule manually, I begin with the recommended configurations from ESLint, typescript-eslint and eslint-plugin-react.
+
+These provide a sensible base. I then add or adjust the rules that matter for the project.
+
+```javascript
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import react from 'eslint-plugin-react';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import { defineConfig, globalIgnores } from 'eslint/config';
+```
+
+I use ESLint's flat-config format because it lets me apply different configuration objects to different groups of files.
+
+## Use warnings during an incremental migration
+
+Many of my customised rules use `warn` instead of `error`:
+
+```javascript
+{
+  rules: {
+    'prefer-const': 'warn',
+    'no-shadow': 'warn',
+  },
+}
+```
+
+A warning remains visible in the editor and terminal, but it does not make every existing issue an immediate blocker.
+
+This is useful when introducing linting to an established codebase. Existing problems can be addressed gradually while new and modified code moves towards the desired standard.
+
+Once a rule is consistently satisfied, it can be promoted from `warn` to `error`.
+
+## Give JavaScript and TypeScript separate rules
+
+A mixed codebase needs separate rule blocks because some core ESLint rules do not understand TypeScript syntax and type information.
+
+For example, TypeScript files should use:
+
+```javascript
+{
+  'no-unused-vars': 'off',
+  '@typescript-eslint/no-unused-vars': 'warn',
+}
+```
+
+The base rule is disabled before its TypeScript-aware replacement is enabled. Running both can produce duplicate or incorrect warnings.
+
+The same approach applies to `no-shadow`:
+
+```javascript
+{
+  'no-shadow': 'off',
+  '@typescript-eslint/no-shadow': 'warn',
+}
+```
+
+I also disable `no-undef` for TypeScript files:
+
+```javascript
+{
+  'no-undef': 'off',
+}
+```
+
+TypeScript already detects references to names that do not exist, and it understands TypeScript's type system better than ESLint's base `no-undef` rule.
+
+The base rule remains valuable for ordinary JavaScript files.
+
+## Keep switch-case declarations scoped
+
+The `no-case-declarations` rule catches lexical declarations placed directly inside a `case`.
+
+All cases in a `switch` statement share the surrounding switch scope. Declaring the same name in separate cases can therefore cause a redeclaration error.
+
+```typescript
+switch (type) {
+  case 'user':
+    const account = getUser();
+    break;
+
+  case 'admin':
+    const account = getAdmin();
+    break;
+}
+```
+
+Wrapping each case in braces creates a separate block scope:
+
+```typescript
+switch (type) {
+  case 'user': {
+    const account = getUser();
+    return account;
+  }
+
+  case 'admin': {
+    const account = getAdmin();
+    return account;
+  }
+
+  default:
+    return null;
+}
+```
+
+I use this pattern whenever a case contains a `const`, `let`, class or function declaration.
+
+## Avoid unnecessary Boolean conversion
+
+The `no-extra-boolean-cast` rule detects Boolean conversions in places where JavaScript already evaluates a value as truthy or falsy.
+
+This conversion is unnecessary:
+
+```typescript
+if (!!user) {
+  displayUser(user);
+}
+```
+
+The condition can be written directly:
+
+```typescript
+if (user) {
+  displayUser(user);
+}
+```
+
+Explicit conversion is still useful when I need to store or return an actual Boolean value:
+
+```typescript
+const hasUser = Boolean(user);
+```
+
+The rule removes redundant conversions without preventing deliberate ones.
+
+## Make unused values visible
+
+Unused variables often indicate forgotten logic, an obsolete import or code left behind during refactoring.
+
+For TypeScript files, I use the TypeScript-aware rule:
+
+```javascript
+{
+  '@typescript-eslint/no-unused-vars': [
+    'warn',
+    {
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+    },
+  ];
+}
+```
+
+The ignore patterns allow an underscore to communicate that a value is intentionally unused:
+
+```typescript
+function handleClick(_event: MouseEvent): void {
+  openMenu();
+}
+```
+
+This is particularly useful when a callback must accept a particular signature even though it does not need every argument.
+
+I prefer warnings over automatically deleting unused variables. During a migration, an unused value may be evidence of unfinished work rather than code that is always safe to remove.
+
+## Prevent confusing variable shadowing
+
+Shadowing happens when an inner variable uses the same name as one in an outer scope.
+
+```typescript
+const name = 'John';
+
+function getName(): string {
+  const name = 'Jane';
+  return name;
+}
+```
+
+The function returns `'Jane'`, but reusing the name makes it easier to misunderstand which value is being referenced.
+
+I prefer distinct names:
+
+```typescript
+const defaultName = 'John';
+
+function getName(): string {
+  const userName = 'Jane';
+  return userName;
+}
+```
+
+For JavaScript, I enable `no-shadow`. For TypeScript, I disable that base rule and enable `@typescript-eslint/no-shadow`.
+
+## Prefer const when reassignment is unnecessary
+
+The `prefer-const` rule detects variables declared with `let` that are never reassigned.
+
+```typescript
+let userName = 'John';
+console.log(userName);
+```
+
+This can be written as:
+
+```typescript
+const userName = 'John';
+console.log(userName);
+```
+
+I use `const` by default and reach for `let` only when reassignment is part of the logic:
+
+```typescript
+let currentPage = 1;
+currentPage += 1;
+```
+
+It is worth remembering that `const` prevents reassignment of the variable. It does not make an object or array immutable:
+
+```typescript
+const user = {
+  name: 'John',
+};
+
+user.name = 'Jane';
+```
+
+## Catch incomplete and unreachable code
+
+The `no-empty` rule identifies blocks that contain no implementation:
+
+```typescript
+if (isReady) {
+}
+```
+
+An empty block can indicate that logic was forgotten. If it is intentionally empty, a comment makes that intent visible:
+
+```typescript
+try {
+  connectToService();
+} catch {
+  // The optional service can fail without blocking the application.
+}
+```
+
+The `no-unreachable` rule catches statements that can never execute:
+
+```typescript
+function getStatus(): string {
+  return 'ready';
+  console.log('This will never run');
+}
+```
+
+Moving the statement before the return makes the control flow valid:
+
+```typescript
+function getStatus(): string {
+  console.log('Calculating status');
+  return 'ready';
+}
+```
+
+These rules are small, but they often expose incomplete refactoring or misplaced return statements.
+
+## Require useful TypeScript boundaries
+
+I do not require explicit return types for every local function.
+
+TypeScript can infer simple return types well:
+
+```typescript
+const add = (a: number, b: number) => a + b;
+```
+
+For that reason, I leave this rule disabled:
+
+```javascript
+{
+  '@typescript-eslint/explicit-function-return-type': 'off';
+}
+```
+
+Exported functions form part of a module's public contract, so I apply a different standard to them:
+
+```javascript
+{
+  '@typescript-eslint/explicit-module-boundary-types': 'warn';
+}
+```
+
+For example:
+
+```typescript
+type User = {
+  username: string;
+  displayName?: string;
+};
+
+export function getDisplayName(user: User): string {
+  return user.displayName ?? user.username;
+}
+```
+
+The explicit return type makes the exported function's contract easier to understand without adding annotations to every small internal function.
+
+## Keep TypeScript's safety visible
+
+The `@typescript-eslint/no-explicit-any` rule warns when `any` bypasses type checking:
+
+```typescript
+function getName(data: any) {
+  return data.name;
+}
+```
+
+When the input shape is known, I prefer to describe it:
+
+```typescript
+type User = {
+  name: string;
+};
+
+function getName(user: User): string {
+  return user.name;
+}
+```
+
+When the shape is genuinely unknown, `unknown` forces the value to be checked before it is used:
+
+```typescript
+function getName(value: unknown): string {
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'name' in value &&
+    typeof value.name === 'string'
+  ) {
+    return value.name;
+  }
+
+  return 'Unknown user';
+}
+```
+
+The `@typescript-eslint/ban-ts-comment` rule also warns about comments such as `@ts-ignore` that suppress type errors without explaining or resolving them.
+
+```typescript
+// @ts-ignore
+const user = getUser();
+```
+
+The preferred solution is to fix or narrow the type. If a suppression is genuinely necessary, `@ts-expect-error` with an explanation is more deliberate:
+
+```typescript
+// @ts-expect-error -- Legacy library types do not include this supported option.
+configureLegacyLibrary({ preserveState: true });
+```
+
+A type assertion is not automatically a fix. It should only be used when the code has information that TypeScript cannot infer.
+
+## Remove expressions that do nothing
+
+The `@typescript-eslint/no-unused-expressions` rule detects expressions whose result is never used and which have no meaningful side effect.
+
+```typescript
+a + b;
+user.name;
+```
+
+The result should be stored, returned or passed somewhere:
+
+```typescript
+const total = a + b;
+console.log(user.name);
+```
+
+This can catch incomplete statements left behind while editing code.
+
+## Configure React for the modern JSX transform
+
+Modern React projects using the automatic JSX transform do not need to import React simply to use JSX.
+
+The React plugin provides a `jsx-runtime` configuration for this setup:
+
+```javascript
+extends: [
+  react.configs.flat.recommended,
+  react.configs.flat['jsx-runtime'],
+];
+```
+
+This disables rules such as `react/react-in-jsx-scope` that were required by the older JSX transform.
+
+A component can therefore be written without an unused React import:
+
+```tsx
+export function WelcomeMessage() {
+  return <p>Welcome back.</p>;
+}
+```
+
+## Disable PropTypes for TypeScript components
+
+The React recommended configuration enables `react/prop-types`. That remains useful for JavaScript React components:
+
+```jsx
+import PropTypes from 'prop-types';
+
+export function Button({ label }) {
+  return <button>{label}</button>;
+}
+
+Button.propTypes = {
+  label: PropTypes.string.isRequired,
+};
+```
+
+For TypeScript components, props are already described by a type:
+
+```tsx
+type ButtonProps = {
+  label: string;
+};
+
+export function Button({ label }: ButtonProps) {
+  return <button>{label}</button>;
+}
+```
+
+I therefore disable `react/prop-types` for `.tsx` files while leaving it available for `.jsx` files.
+
+## Protect links that open new tabs
+
+The `react/jsx-no-target-blank` rule checks links that use `target="_blank"`.
+
+```tsx
+<a href="https://example.com" target="_blank">
+  Visit website
+</a>
+```
+
+The link should include an appropriate `rel` attribute:
+
+```tsx
+<a href="https://example.com" target="_blank" rel="noopener noreferrer">
+  Visit website
+</a>
+```
+
+This prevents the opened page from receiving access to the original page through `window.opener`, while `noreferrer` also prevents referrer information from being sent.
+
+## Give list items stable keys
+
+React uses keys to preserve the identity of items between renders.
+
+```tsx
+<ul>
+  {users.map(user => (
+    <li>{user.name}</li>
+  ))}
+</ul>
+```
+
+Each item should have a stable key:
+
+```tsx
+<ul>
+  {users.map(user => (
+    <li key={user.id}>{user.name}</li>
+  ))}
+</ul>
+```
+
+A stable identifier is usually preferable to an array index, especially when items can be inserted, removed or reordered.
+
+## Keep component intent clear
+
+Several smaller React rules help make JSX easier to understand:
+
+- `react/display-name` makes anonymous components easier to identify in debugging tools.
+- `react/no-children-prop` encourages nested JSX instead of manually passing `children`.
+- `react/no-deprecated` identifies deprecated React APIs.
+- `react/self-closing-comp` shortens elements that have no children.
+
+For example, I prefer:
+
+```tsx
+<Avatar src={imageUrl} alt={userName} />
+```
+
+Instead of:
+
+```tsx
+<Avatar src={imageUrl} alt={userName}></Avatar>
+```
+
+Likewise, children are clearer when nested:
+
+```tsx
+<Panel>
+  <p>Account details</p>
+</Panel>
+```
+
+Rather than passed through the `children` prop:
+
+```tsx
+<Panel children={<p>Account details</p>} />
+```
+
+## Let Prettier handle formatting
+
+ESLint and Prettier have different responsibilities in this setup:
+
+- ESLint identifies suspicious code and enforces code-quality rules.
+- Prettier formats the source code.
+
+I place `eslint-config-prettier` last so it can disable ESLint rules that would conflict with Prettier:
+
+```javascript
+export default defineConfig([
+  // Other configuration objects...
+  eslintConfigPrettier,
+]);
+```
+
+Flat-config order matters. When multiple configuration objects apply to the same file, later rule settings can override earlier ones.
+
+## The complete flat configuration
+
+This is the cleaned-up configuration for a mixed JavaScript, TypeScript and React project using the modern JSX transform:
+
+```javascript
+// @ts-check
+
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import react from 'eslint-plugin-react';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import { defineConfig, globalIgnores } from 'eslint/config';
+
+const javascriptFiles = ['**/*.{js,mjs,cjs,jsx}'];
+const typescriptFiles = ['**/*.{ts,mts,cts,tsx}'];
+const reactFiles = ['**/*.{jsx,tsx}'];
+
+export default defineConfig([
+  globalIgnores([
+    // Dependencies and build output
+    '**/node_modules/**',
+    '**/dist/**',
+    '**/build/**',
+    '**/out/**',
+
+    // Environment files
+    '**/.env*',
+
+    // Generated and declaration files
+    '**/*.min.js',
+    '**/*.d.ts',
+
+    // Project configuration
+    '**/eslint.config.js',
+    '**/eslint.config.mjs',
+    '**/prettier.config.js',
+    '**/prettier.config.cjs',
+
+    // Package-manager files
+    '**/pnpm-workspace.yaml',
+    '**/pnpm-lock.yaml',
+
+    // Other files not handled by this configuration
+    '**/*.less',
+    '**/.git/**',
+    '**/.vscode/**',
+  ]),
+
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
+  },
+
+  {
+    files: [...javascriptFiles, ...typescriptFiles],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+  },
+
+  {
+    files: javascriptFiles,
+    rules: {
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      'no-undef': 'warn',
+      'no-shadow': 'warn',
+      'prefer-const': 'warn',
+      'no-case-declarations': 'warn',
+      'no-empty': 'warn',
+      'no-unreachable': 'warn',
+      'no-extra-boolean-cast': 'warn',
+    },
+  },
+
+  {
+    files: typescriptFiles,
+    extends: [tseslint.configs.recommended],
+    rules: {
+      // Disable base rules that TypeScript handles or replaces.
+      'no-unused-vars': 'off',
+      'no-shadow': 'off',
+      'no-undef': 'off',
+
+      'prefer-const': 'warn',
+      'no-case-declarations': 'warn',
+      'no-empty': 'warn',
+      'no-unreachable': 'warn',
+      'no-extra-boolean-cast': 'warn',
+
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/no-shadow': 'warn',
+      '@typescript-eslint/no-unused-expressions': 'warn',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/ban-ts-comment': 'warn',
+    },
+  },
+
+  {
+    files: reactFiles,
+    extends: [
+      react.configs.flat.recommended,
+      react.configs.flat['jsx-runtime'],
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      'react/jsx-no-target-blank': 'warn',
+      'react/no-deprecated': 'warn',
+      'react/display-name': 'warn',
+      'react/no-children-prop': 'warn',
+      'react/jsx-key': 'warn',
+      'react/self-closing-comp': 'warn',
+    },
+  },
+
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      'react/prop-types': 'off',
+    },
+  },
+
+  // Keep this last so Prettier can disable conflicting formatting rules.
+  eslintConfigPrettier,
+]);
+```
+
+The required development dependencies can be installed with:
+
+```bash
+npm install --save-dev \
+  eslint \
+  @eslint/js \
+  typescript \
+  typescript-eslint \
+  eslint-plugin-react \
+  eslint-config-prettier \
+  globals
+```
+
+ESLint can then be run from the project root:
+
+```bash
+npx eslint .
+```
+
+To apply ESLint's safe automatic fixes:
+
+```bash
+npx eslint . --fix
+```
+
+## Tighten the configuration gradually
+
+This configuration is a starting point rather than a finished definition of code quality.
+
+Warnings make issues visible without forcing an established codebase to resolve everything immediately. As the JavaScript-to-TypeScript migration progresses, individual rules can move from `warn` to `error`, ignored files can be brought into scope, and type-aware linting can be added where it provides enough value.
+
+The goal is steady improvement: use the correct rules for each language, avoid duplicate warnings, and make the configuration stricter at a pace the codebase can support.
