@@ -32,4 +32,5 @@
   --small-font-size: var(--font-size-sm);
   --large-title-gap: 48px;
   --page-title-gap-bottom: 66px;
+  --opacity-25: 0.25;
 }

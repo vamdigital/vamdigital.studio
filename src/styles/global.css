@@ -2339,3 +2339,7 @@ select:focus-visible {
     animation: none !important;
   }
 }
+
+.opacity-25 {
+  opacity: var(--opacity-25);
+}
