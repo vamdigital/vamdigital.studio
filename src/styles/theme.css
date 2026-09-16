@@ -1,6 +1,6 @@
 /* Theme for VAM Digital Studio */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg-color: #FAFAF9;
   --surface-color: #F3F3EF;
   --surface-raised: #FFFFFF;
@@ -17,6 +17,7 @@
 
 /* Light Mode */
 :root[data-theme="light"] {
+  color-scheme: light;
   --bg-color: #FAFAF9;
   --surface-color: #F3F3EF;
   --surface-raised: #FFFFFF;
@@ -32,6 +33,7 @@
 }
 
 :root[data-theme="dark"] {
+  color-scheme: dark;
   --bg-color: #34322D;
   --surface-color: #3D3B35;
   --surface-raised: #45423C;
@@ -49,6 +51,7 @@
 /* Dark Mode */
 @media(prefers-color-scheme: dark) {
   :root:not([data-theme]) {
+    color-scheme: dark;
     --bg-color: #34322D;
     --surface-color: #3D3B35;
     --surface-raised: #45423C;

@@ -1,0 +1,246 @@
+---
+title: 'What is shift left in software development?'
+pubDate: 2026-09-16
+description: 'How shift-left practices bring testing, security and quality checks earlier into the software development lifecycle.'
+category: 'Software Engineering'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+draft: true
+tags:
+  - Shift Left
+  - SDLC
+  - Software Testing
+  - Engineering Practices
+---
+
+Shift left is the practice of bringing testing, security, accessibility and other quality checks earlier into the software development lifecycle.
+
+Instead of waiting until a feature is complete before asking whether it works correctly, the team considers quality while the feature is being understood, designed and built.
+
+The aim is simple: find problems when they are still easier to discuss and change.
+
+## What does shift left mean?
+
+A traditional software development process is sometimes imagined as a line moving from left to right:
+
+1. Requirements
+2. Design
+3. Development
+4. Testing
+5. Deployment
+6. Production
+
+In that model, testing and security checks may happen towards the right-hand side, after most of the implementation has been completed.
+
+Shifting left moves some of that work closer to the beginning:
+
+- QA contributes while requirements are being discussed.
+- Accessibility is considered during design.
+- Security risks are reviewed before implementation.
+- Developers write automated tests alongside the code.
+- Static analysis runs while code is being developed.
+- Tests run automatically when changes are pushed.
+
+Shift left does not introduce a new stage to the SDLC. It changes when the team begins thinking about quality.
+
+## Shift left is more than early testing
+
+Shift left is often described as “testing earlier”, but its meaning is broader than that.
+
+It can include:
+
+- Clarifying requirements before development
+- Identifying edge cases during refinement
+- Reviewing designs for accessibility
+- Considering security risks before choosing an implementation
+- Writing unit, component and integration tests during development
+- Running linting and type checking in the editor
+- Running automated checks in continuous integration
+- Giving developers fast feedback on their changes
+
+The central idea is that quality belongs throughout the development process rather than being inspected only at the end.
+
+## Why is shift left important in the SDLC?
+
+Problems discovered late often require more work to resolve.
+
+A missing requirement found during a planning discussion might only need a short conversation and an updated acceptance criterion. The same issue discovered after development could require changes to the design, application code, automated tests and documentation.
+
+Shift-left practices help teams reduce this kind of avoidable rework.
+
+### Requirements become clearer
+
+When engineering, design and QA review a feature early, they are likely to ask different questions.
+
+For example:
+
+- What should happen when there are no results?
+- What happens when the request fails?
+- Can the feature be used with a keyboard?
+- Which users are allowed to perform the action?
+- What should happen when the supplied data is invalid?
+
+These questions expose ambiguity before it becomes code.
+
+### Feedback arrives sooner
+
+Developers do not have to wait for a separate testing phase to discover basic problems.
+
+Type checking, linting, unit tests and component tests can provide feedback within seconds or minutes. This makes it easier to correct a problem while the relevant code and decisions are still fresh.
+
+### Quality becomes a shared responsibility
+
+Shift left does not mean transferring all testing work to developers or making QA unnecessary.
+
+Developers, QA engineers, designers, security specialists and product managers contribute different knowledge. Involving them earlier makes quality a shared responsibility while preserving their specialist roles.
+
+QA can help identify risks and important scenarios before implementation. Developers can automate suitable checks. Designers can catch interaction and accessibility problems. Product managers can clarify expected behaviour.
+
+### Delivery becomes more predictable
+
+Late discoveries can delay a release because they introduce unexpected work near the end of development.
+
+Earlier checks cannot remove every surprise, but they make many common problems visible sooner. This gives the team more time to respond without disrupting the final stages of delivery.
+
+### Automated checks support frequent changes
+
+Modern teams often make small changes and release frequently. A long manual testing phase after every change does not scale well for this way of working.
+
+Automated checks running during development and in continuous integration provide a repeatable level of confidence each time the code changes.
+
+## A simple shift-left example
+
+Imagine a team is building a profile-picture upload feature.
+
+The initial requirement says:
+
+> A user should be able to upload a profile picture.
+
+If development starts immediately, the engineer may build the file input, send the image to the server and display the result. During final testing, QA might then discover unanswered questions:
+
+- Which file formats are supported?
+- What is the maximum file size?
+- What happens when the upload fails?
+- Can the file input be used with a keyboard?
+- Should the existing picture remain if the upload fails?
+- Can a file that is not really an image be uploaded?
+- What message should the user see while the upload is in progress?
+
+Answering these questions late may require changes across the UI, API, validation and tests.
+
+With a shift-left approach, product, design, engineering and QA discuss the feature before implementation begins.
+
+They agree that:
+
+- Only selected image formats are accepted.
+- The client and server both validate file size.
+- The existing picture remains when an upload fails.
+- The interface displays loading, success and error states.
+- The control has an accessible label and can be used with a keyboard.
+- The server verifies the uploaded content rather than trusting its filename.
+
+The engineer can then build these behaviours from the start and add appropriate automated checks alongside the implementation.
+
+The feature still needs testing, but fewer fundamental questions are left until the end.
+
+## How teams can adopt shift left
+
+Shift left works best when it is introduced as a team practice rather than a collection of tools.
+
+### Involve the right people during refinement
+
+Product, design, engineering and QA should discuss important features before implementation.
+
+The purpose is not to make every meeting larger. It is to involve the people who can identify risks, unclear behaviour and missing requirements while changes are still inexpensive.
+
+Useful questions include:
+
+- What is the expected user outcome?
+- What are the main success and failure paths?
+- What happens with missing or invalid data?
+- Are there permission or security concerns?
+- What accessibility requirements apply?
+- Which behaviour should be automated?
+
+### Write testable acceptance criteria
+
+Requirements should be specific enough for the team to verify.
+
+A vague requirement such as:
+
+> The search should be fast.
+
+Is difficult to test because “fast” has not been defined.
+
+A clearer requirement describes an observable expectation appropriate to the product and its environment.
+
+Acceptance criteria should cover more than the successful path. Empty states, loading states, invalid input, permissions and failures are often where ambiguity appears.
+
+### Add checks close to development
+
+Developers should receive useful feedback before a change reaches final testing.
+
+Depending on the project, this can include:
+
+- Type checking
+- Linting
+- Unit tests
+- Component tests
+- API or integration tests
+- Accessibility checks
+- Dependency and security scanning
+
+Not every behaviour needs the same type of test. The team should choose the quickest reliable check for each risk.
+
+### Run automated checks in continuous integration
+
+Checks that only run on one developer’s machine are easy to miss.
+
+Continuous integration can run the agreed checks whenever code is pushed or a pull request is opened:
+
+```text
+Code change
+  → linting and type checking
+  → unit and component tests
+  → integration tests
+  → build verification
+  → review
+```
+
+Fast checks should normally run first so that developers receive useful feedback as soon as possible.
+
+### Keep changes small
+
+Small changes are easier to review, test and understand.
+
+When a pull request contains several unrelated features, it becomes harder to identify where a problem was introduced. Smaller changes shorten the feedback loop and make failures easier to investigate.
+
+### Improve the process gradually
+
+A team does not need to introduce every possible test and tool at once.
+
+It can begin with a recurring problem. If incorrect input frequently reaches QA, add earlier validation tests. If accessibility problems appear late, include accessibility review during design and add automated checks where they are useful.
+
+The team can then expand the approach based on what it learns.
+
+## What shift left does not mean
+
+Shift left should not be treated as a reason to remove later testing or production monitoring.
+
+Some problems only appear in realistic environments, under production traffic or through unexpected user behaviour. Exploratory testing, end-to-end testing, observability and monitoring remain important.
+
+A healthy approach uses both sides:
+
+- Shift left to prevent and detect problems early.
+- Continue testing later stages of the system.
+- Monitor production to learn from real behaviour.
+
+It also does not mean automating every test. Automation is valuable for repeatable checks, while human exploration remains useful for usability, unexpected interactions and risks that were not anticipated.
+
+## Earlier conversations lead to better software
+
+Shift left is not mainly about moving boxes around on a process diagram. It is about shortening the distance between making a decision and receiving feedback about it.
+
+When teams discuss risks earlier, define testable behaviour and automate suitable checks during development, they reduce avoidable rework and make delivery more predictable.
+
+The goal is not to catch every possible problem before production. It is to build quality into the development process instead of waiting until the end to look for it.
