@@ -6,22 +6,38 @@ const {
   date,
   title,
   description,
+  tags = [],
   readTime
 } = Astro.props;
+
+const visibleTags = tags.slice(0, 3);
+const tagFilterHref = (tag: string) => `/notes?tag=${encodeURIComponent(tag)}`;
 ---
-<article class="note-card">
+<article
+  class="note-card"
+  data-note-tags={JSON.stringify(tags.map(tag => tag.toLowerCase()))}
+>
   <div class="note-card__meta">
     <span>{category}</span>
-    <span>{number}</span>
+    <span data-note-number data-note-number-original={number}>{number}</span>
   </div>
-  <a href={`/notes/${slug}`} class="note-card__link link-color">
+  <div class="note-card__body">
     <div class="note-card__content">
-      <h2 transition:name={`post-title-${slug}`}>{title}</h2>
+      <h2 transition:name={`post-title-${slug}`}>
+        <a href={`/notes/${slug}`} class="note-card__link link-color">{title}</a>
+      </h2>
       <p>{description}</p>
+      {visibleTags.length > 0 && (
+        <ul class="post-tags note-card__tags" aria-label="Topics">
+          {visibleTags.map(tag => (
+            <li><a class="post-tag" href={tagFilterHref(tag)} data-note-tag={tag}>{tag}</a></li>
+          ))}
+        </ul>
+      )}
     </div>
     <div class="note-card__footer">
       <span>{date} · {readTime}</span>
       <span class="note-card__action">Read note <span aria-hidden="true">→</span></span>
     </div>
-  </a>
+  </div>
 </article>

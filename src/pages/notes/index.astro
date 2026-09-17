@@ -9,6 +9,7 @@ interface NoteFrontmatter {
   pubDate: string | Date;
   description: string;
   category?: string;
+  tags?: string[];
   draft?: boolean;
 }
 
@@ -34,6 +35,7 @@ const posts = Object.entries(modules)
       date: published.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' }),
       title: module.frontmatter.title,
       description: module.frontmatter.description,
+      tags: module.frontmatter.tags ?? [],
       readTime: calculateReadingTime(markdown),
       draft: module.frontmatter.draft ?? false,
       published
@@ -52,7 +54,12 @@ const posts = Object.entries(modules)
     mainTitle="Notes on building for the web."
     subTitle="Thoughts on design, frontend architecture, product engineering, testing, and the everyday discoveries behind interfaces that last."
   />
-  <section class="notes-frame grid-frame" aria-label="Published notes">
+  <aside class="notes-filter" data-note-filter aria-live="polite" hidden>
+    <p data-note-filter-message></p>
+    <a href="/notes">View all notes <span aria-hidden="true">×</span></a>
+  </aside>
+  <section class="notes-frame grid-frame" aria-label="Published notes" data-note-results>
     {posts.map(post => <Note {...post} />)}
   </section>
+  <script src="../../scripts/note-filter.js"></script>
 </BaseLayout>

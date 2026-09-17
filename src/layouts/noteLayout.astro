@@ -78,7 +78,11 @@ const olderNote =
           <div class="article-sidebar__section">
             <p>Topics</p>
             <div class="post-tags">
-              {tags.map(tag => <span class="post-tag">{tag}</span>)}
+              {tags.map(tag => (
+                <a class="post-tag" href={`/notes?tag=${encodeURIComponent(tag)}`}>
+                  {tag}
+                </a>
+              ))}
             </div>
           </div>
           <p class="article-sidebar__note">
