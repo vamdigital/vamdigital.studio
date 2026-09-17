@@ -1,0 +1,291 @@
+---
+title: 'The Prettier rules I use in JavaScript and TypeScript projects'
+pubDate: 2025-07-28
+description: 'A practical explanation of the Prettier options I use to keep JavaScript and TypeScript formatting consistent.'
+category: 'Developer Tooling'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+tags:
+  - Prettier
+  - JavaScript
+  - TypeScript
+  - Code Quality
+---
+
+Prettier removes many of the small formatting decisions that otherwise come up while writing code. Instead of deciding how each file should look, I can define a few preferences and let Prettier apply them consistently.
+
+This is the configuration I currently use across my JavaScript and TypeScript projects, along with what each option changes and why I prefer it.
+
+## My Prettier configuration
+
+If the project's `package.json` uses `"type": "commonjs"`, the configuration can be stored in `prettier.config.cjs`.
+
+A CommonJS configuration must use `module.exports`:
+
+```javascript
+module.exports = {
+  arrowParens: 'avoid',
+  semi: true,
+  singleQuote: true,
+  trailingComma: 'es5',
+  bracketSpacing: true,
+  printWidth: 80,
+  tabWidth: 2,
+  endOfLine: 'lf',
+};
+```
+
+If the project uses ES modules instead, the configuration file and export syntax will need to change. For example, `prettier.config.mjs` uses `export default`.
+
+## Remove optional arrow-function parentheses
+
+The `arrowParens` option controls whether a single arrow-function parameter is surrounded by parentheses.
+
+```javascript
+{
+  arrowParens: 'avoid';
+}
+```
+
+With `avoid`, Prettier removes the parentheses when a function has one simple parameter:
+
+```javascript
+const add = a => a + 1;
+
+const getName = user => user.name;
+```
+
+Parentheses remain when the function has multiple parameters:
+
+```javascript
+const add = (a, b) => a + b;
+
+const getItem = (item, index) => `${index}: ${item.name}`;
+```
+
+They are also necessary in TypeScript when the parameter has a type annotation:
+
+```typescript
+const getName = (user: User) => user.name;
+```
+
+I prefer `avoid` because it keeps simple arrow functions visually lighter without changing cases where parentheses are required.
+
+## Use semicolons consistently
+
+The `semi` option tells Prettier to add semicolons at the end of statements where appropriate.
+
+```javascript
+{
+  semi: true;
+}
+```
+
+For example, Prettier formats this:
+
+```javascript
+const name = 'John';
+const age = 25;
+console.log(name, age);
+```
+
+As:
+
+```javascript
+const name = 'John';
+const age = 25;
+console.log(name, age);
+```
+
+JavaScript has Automatic Semicolon Insertion, so semicolons are not required after every statement. I still prefer to include them because the statement boundaries are explicit and the style remains consistent throughout the project.
+
+## Prefer single quotes
+
+The `singleQuote` option uses single quotes instead of double quotes where possible.
+
+```javascript
+{
+  singleQuote: true;
+}
+```
+
+For example:
+
+```javascript
+const message = 'Hello world';
+const status = 'active';
+```
+
+This option does not change template literals. Backticks are still used when a string contains interpolation:
+
+```javascript
+const message = `Welcome, ${name}`;
+```
+
+Prettier may also keep double quotes when doing so avoids unnecessary escaping. I use `singleQuote` because single quotes are the convention I prefer in JavaScript and TypeScript files.
+
+## Add trailing commas where ES5 supports them
+
+The `trailingComma` option controls whether Prettier adds a comma after the final item in a multi-line structure.
+
+```javascript
+{
+  trailingComma: 'es5';
+}
+```
+
+With this setting, objects and arrays can include a trailing comma:
+
+```javascript
+const user = {
+  name: 'John',
+  age: 25,
+};
+
+const permissions = ['read', 'write'];
+```
+
+The `es5` value adds trailing commas where they are valid in ES5 syntax, including objects and arrays. It does not add them to function parameters.
+
+I find trailing commas useful because adding another property or item often produces a smaller and clearer Git diff.
+
+Without a trailing comma, changing:
+
+```javascript
+const user = {
+  name: 'John',
+  age: 25,
+};
+```
+
+To include another property modifies two existing lines:
+
+```javascript
+const user = {
+  name: 'John',
+  age: 25,
+  role: 'admin',
+};
+```
+
+With trailing commas enabled, the existing `age` line does not need to change:
+
+```javascript
+const user = {
+  name: 'John',
+  age: 25,
+  role: 'admin',
+};
+```
+
+## Add spaces inside object braces
+
+The `bracketSpacing` option controls spacing inside object literal braces, destructuring assignments and named imports.
+
+```javascript
+{
+  bracketSpacing: true;
+}
+```
+
+It formats objects like this:
+
+```javascript
+const user = { name: 'John', age: 25 };
+
+const { name, age } = user;
+
+import { useEffect, useState } from 'react';
+```
+
+Instead of:
+
+```javascript
+const user = { name: 'John', age: 25 };
+
+const { name, age } = user;
+
+import { useEffect, useState } from 'react';
+```
+
+Despite its name, this option does not add spaces inside array brackets. Arrays remain formatted like this:
+
+```javascript
+const numbers = [1, 2, 3];
+```
+
+I find the additional space inside object braces makes properties and imported names easier to distinguish from the surrounding syntax.
+
+## Use a print width of 80 characters
+
+The `printWidth` option gives Prettier a preferred line length.
+
+```javascript
+{
+  printWidth: 80;
+}
+```
+
+When an expression becomes too wide, Prettier will usually split it across multiple lines:
+
+```javascript
+const createUserMessage = (username, email, role, permissions) => {
+  return `${username} has been registered with the ${role} role.`;
+};
+```
+
+`printWidth` is not a strict maximum character limit. It is a guide that Prettier uses when deciding how to format code, and some content may still extend beyond it.
+
+I use `80` because it keeps most code comfortable to read in split editor panes and terminal windows.
+
+## Use two spaces for indentation
+
+The `tabWidth` option controls the number of spaces used for each indentation level.
+
+```javascript
+{
+  tabWidth: 2;
+}
+```
+
+With a width of two spaces, nested code remains compact:
+
+```javascript
+function createUser() {
+  const user = {
+    name: 'John',
+    permissions: {
+      files: ['read', 'write'],
+    },
+  };
+
+  return user;
+}
+```
+
+I prefer two spaces because it leaves more horizontal room when working with deeply nested JavaScript, TypeScript and JSX.
+
+## Normalise line endings to LF
+
+The `endOfLine` option controls the line-ending characters used in formatted files.
+
+```javascript
+{
+  endOfLine: 'lf';
+}
+```
+
+Operating systems have historically used different line endings:
+
+- Linux and macOS commonly use Line Feed (`LF`).
+- Windows has traditionally used Carriage Return followed by Line Feed (`CRLF`).
+
+These characters are normally invisible in an editor, but inconsistent line endings can create noisy Git diffs or cause files to appear modified when their visible content has not changed.
+
+Setting `endOfLine` to `lf` gives the project one consistent line-ending format across different development environments.
+
+## Consistency is the main benefit
+
+Most Prettier options are formatting preferences rather than rules that make one style universally better than another. Their real value comes from applying the chosen style consistently.
+
+This configuration gives me readable line lengths, compact indentation, predictable punctuation and cleaner diffs. More importantly, it means I can spend less time adjusting formatting by hand and more time thinking about the code itself.

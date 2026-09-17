@@ -5,14 +5,18 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "npm run build && npx wrangler dev",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
-    "astro": "^5.16.6"
+    "@astrojs/mdx": "^4.3.13",
+    "astro": "^5.16.6",
+    "npm-quick-run": "^1.18.0"
   },
   "devDependencies": {
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
     "wrangler": "^4.54.0"
   }
 }

@@ -1,0 +1,111 @@
+---
+import BaseLayout from "../layouts/baseLayout.astro";
+import Title from '../components/title.astro';
+---
+
+<BaseLayout title="Connect with me — VAM Digital Studio" description="Start a conversation with Vaibhav Shringarpure about frontend engineering work.">
+  <Title mainTitle="Connect with me" subTitle="Open to conversations, ideas, and thoughtful work." />
+
+  <section class="connect-grid grid-frame">
+    <div class="connect-intro">
+      <p class="eyebrow"><span class="status-dot"></span>Open to Outside IR35 contracts</p>
+      <h2>Let’s make your frontend feel effortless.</h2>
+      <p>No lengthy brief needed. Share the basics here, or contact me directly.</p>
+      <div class="contact-methods">
+        <a class="contact-method" href="mailto:vibs.sh@gmail.com">
+          <span class="contact-method__label">Email</span>
+          <span class="contact-method__value">vibs.sh@gmail.com</span>
+          <span class="contact-method__arrow" aria-hidden="true"></span>
+        </a>
+        <a class="contact-method" href="https://www.linkedin.com/in/vaibhavshringarpure" target="_blank" rel="noreferrer">
+          <span class="contact-method__label">LinkedIn</span>
+          <span class="contact-method__value">vaibhavshringarpure</span>
+          <span class="contact-method__arrow contact-method__arrow--external" aria-hidden="true"></span>
+        </a>
+      </div>
+    </div>
+
+    <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value="3854a529-2aca-4d00-a351-08a5f7091f10" />
+      <input type="hidden" name="subject" value="New portfolio enquiry" />
+      <input type="hidden" name="from_name" value="VAM Digital Studio portfolio" />
+      <input class="botcheck" type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" />
+      <div class="form-heading"><div><h2>Tell me a little about the project</h2><p>It should take less than a minute.</p></div><span>Quick enquiry</span></div>
+      <div class="field-grid">
+        <label class="form-field"><span>Your name</span><input type="text" name="name" autocomplete="name" placeholder="Jane Smith" required /></label>
+        <label class="form-field"><span>Email address</span><input type="email" name="email" autocomplete="email" placeholder="jane@company.com" required /></label>
+      </div>
+      <fieldset>
+        <legend>What can I help with? <span>Select all that apply.</span></legend>
+        <div class="choice-row">
+          {['Frontend build', 'Modernisation', 'Design systems', 'Something else'].map(option => (
+            <label class="project-choice">
+              <input type="checkbox" name="projectType" value={option} />
+              <span>{option}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <label class="form-field"><span>A few details</span><textarea name="message" rows="4" placeholder="We need help with…" required></textarea></label>
+      <div class="form-actions">
+        <div class="form-feedback">
+          <p>Your details are used only to respond to this enquiry.</p>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </div>
+        <button class="form-submit" type="submit"><span class="form-submit__label">Send enquiry</span> <span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    function setupContactForm() {
+      const form = document.querySelector<HTMLFormElement>('#contact-form');
+      if (!form || form.dataset.ready === 'true') return;
+      form.dataset.ready = 'true';
+
+      const submitButton = form.querySelector<HTMLButtonElement>('.form-submit');
+      const submitLabel = form.querySelector<HTMLElement>('.form-submit__label');
+      const status = form.querySelector<HTMLElement>('#form-status');
+
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (!submitButton || !submitLabel || !status) return;
+
+        submitButton.disabled = true;
+        form.setAttribute('aria-busy', 'true');
+        submitLabel.textContent = 'Sending…';
+        status.textContent = '';
+        status.removeAttribute('data-state');
+
+        try {
+          const formData = new FormData(form);
+          const projectTypes = formData.getAll('projectType').map(String);
+          formData.set('projectType', projectTypes.join(', ') || 'Not specified');
+
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: { Accept: 'application/json' },
+          });
+          const result = await response.json() as { success?: boolean };
+
+          if (!response.ok || !result.success) throw new Error('Submission failed');
+
+          status.textContent = 'Thanks — your enquiry has been sent. I’ll be in touch soon.';
+          status.dataset.state = 'success';
+          form.reset();
+        } catch {
+          status.textContent = 'That didn’t send. Please try again, or use the email link alongside the form.';
+          status.dataset.state = 'error';
+        } finally {
+          submitButton.disabled = false;
+          form.removeAttribute('aria-busy');
+          submitLabel.textContent = 'Send enquiry';
+        }
+      });
+    }
+
+    document.addEventListener('astro:page-load', setupContactForm);
+    setupContactForm();
+  </script>
+</BaseLayout>

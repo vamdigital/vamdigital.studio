@@ -1,0 +1,39 @@
+---
+import {ClientRouter} from "astro:transitions"
+import "../styles/reset.css"
+import "../styles/tokens.css"
+import "../styles/theme.css"
+import "../styles/global.css"
+
+import Header from "../components/header.astro"
+import Footer from "../components/footer.astro"
+
+const { 
+  title = "VAM Digital Studio",
+  description = "Design-focused frontend engineering, experiments, and notes on building thoughtful digital interfaces."
+} = Astro.props
+--- 
+<html lang="en">
+	<head>
+    <ClientRouter />
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" media="(prefers-color-scheme: light)" />
+		<link rel="icon" type="image/svg+xml" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+		<title>{title}</title>
+	</head>
+	<body>
+    <div class="container">
+      <Header />
+      <main id="main-content">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+		<script src="../scripts/note-navigation.js"></script>
+		<script src="../scripts/code-blocks.js"></script>
+	</body>
+</html>

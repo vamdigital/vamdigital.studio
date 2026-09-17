@@ -1,0 +1,21 @@
+---
+title: "Designing pagination that feels simple to the user"
+pubDate: 2026-03-18
+description: "What cursor-based APIs change in the UI—and the small decisions that keep navigation predictable."
+category: "React"
+layout: ../../layouts/noteLayout.astro
+author: "Vaibhav Shringarpure"
+tags: ["React", "UX", "Search"]
+---
+
+Pagination is rarely just a pair of buttons. Loading states, changing filters, browser history, result counts, and uncertain totals all affect whether moving through results feels dependable.
+
+## Let the API shape the controls
+
+With cursor-based pagination, the interface should avoid promising page numbers it cannot know. Previous and next actions can still feel familiar when their state is clear and the current result range is explained honestly.
+
+## Preserve the user's place
+
+Search terms and filters belong in the URL. That makes navigation reversible, shareable, and much less surprising when someone returns from a result.
+
+Simple pagination is the result of handling these edges deliberately.

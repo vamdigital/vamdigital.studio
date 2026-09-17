@@ -1,43 +1,36 @@
-# Astro Starter Kit: Minimal
+# VAM Digital Studio
 
-```sh
-npm create astro@latest -- --template minimal
+An Astro portfolio for Vaibhav Shringarpure, combining a restrained editorial design with grid-based project, experience, notes, and contact pages.
+
+## Stack
+
+- Astro 5
+- MDX for Markdown-first notes
+- Astro ClientRouter and View Transitions
+- Token-based CSS with light, dark, and system themes
+- Cloudflare adapter and Wrangler staging configuration
+
+## Commands
+
+| Command | Action |
+| --- | --- |
+| `npm install` | Install dependencies |
+| `npm run dev` | Start the local server at `localhost:4321` |
+| `npm run build` | Build to `./dist/` |
+| `npm run preview` | Preview the production build |
+
+## Writing a note post
+
+Add writing as an `.mdx` file beneath `src/pages/notes/` and use `noteLayout.astro` in its frontmatter. The Notes grid and reading time are generated automatically from the file.
+
+Use a fenced code block with a language name to enable syntax highlighting:
+
+````md
+```tsx
+export function Greeting({ name }: { name: string }) {
+  return <p>Hello {name}</p>;
+}
 ```
+````
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Astro uses Shiki with `github-light` and `github-dark`. Change the `codeThemes` values near the top of `astro.config.mjs` to select different bundled Shiki themes.
