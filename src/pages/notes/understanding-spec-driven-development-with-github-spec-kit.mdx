@@ -379,6 +379,42 @@ The result is not guaranteed to be correct simply because a specification exists
 
 In the next note, I will walk through setting up GitHub Spec Kit and using its workflow on a practical example.
 
+## A simple way to remember the workflow
+
+The complete workflow is easier to remember when each command is connected to one question:
+
+```text
+Constitution
+    ↓
+Specify → Clarify* → Plan → Checklist* → Tasks → Analyze* → Implement → Converge
+                                                                          │
+                                                   remaining work ─────────┘
+```
+
+The constitution is normally created once for the project. The remaining stages are repeated for each feature.
+
+The commands marked with `*` are optional quality gates. They become particularly useful when a feature contains ambiguity, risk or several connected requirements.
+
+A simple memory aid is:
+
+| Stage        | What to remember                                   |
+| ------------ | -------------------------------------------------- |
+| Constitution | What rules must the project follow?                |
+| Specify      | What are we building, and why?                     |
+| Clarify      | What is still unclear?                             |
+| Plan         | How will we build it?                              |
+| Checklist    | Are the requirements good enough?                  |
+| Tasks        | What work needs to be completed?                   |
+| Analyze      | Do the artifacts agree with one another?           |
+| Implement    | Build and test the feature                         |
+| Converge     | Does the implementation satisfy the agreed intent? |
+
+The shorter version is:
+
+> **Rules → requirements → clarity → design → quality → work → consistency → code → completion**
+
+If convergence discovers missing work, it adds new tasks. The team then returns to implementation and repeats the check until the feature has converged.
+
 ## Further reading
 
 - [GitHub Spec Kit repository](https://github.com/github/spec-kit)
