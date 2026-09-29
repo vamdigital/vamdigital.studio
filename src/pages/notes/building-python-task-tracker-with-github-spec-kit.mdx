@@ -1,0 +1,936 @@
+---
+title: 'Building a Python task tracker with GitHub Spec Kit'
+pubDate: 2026-09-29
+description: 'A practical walkthrough of using GitHub Spec Kit and Pi to specify, plan, implement and verify a small Python command-line application.'
+category: 'AI and Developer Tools'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+tags:
+  - GitHub Spec Kit
+  - Spec-Driven Development
+  - Python
+  - AI-Assisted Development
+---
+
+Before following this tutorial, it may help to read [Understanding spec-driven development with GitHub Spec Kit](/notes/understanding-spec-driven-development-with-github-spec-kit), which explains the ideas behind the workflow and where Spec Kit fits.
+
+This time, I wanted to use the complete workflow on a small application rather than only reading about the individual stages.
+
+The result was a Python command-line task tracker that lets one local user:
+
+- Add a task
+- List existing tasks
+- Mark a task as complete
+- Delete a task
+- Preserve task data between separate runs
+
+The application itself is intentionally small. The main purpose of the exercise is to understand how an idea moves through specification, clarification, planning, tasks, implementation and final verification.
+
+## Tutorial environment
+
+This walkthrough was completed using:
+
+- GitHub Spec Kit CLI `1.0.12`
+- The Pi coding-agent integration
+- Shell (`sh`) scripts
+- Python 3.11 or newer
+- Pytest for automated testing
+
+Spec Kit continues to evolve, so later versions may generate different files or expose commands differently. Run the following command to check the version installed on your machine:
+
+```bash
+specify version
+```
+
+There are two types of commands throughout this tutorial:
+
+- Commands beginning with `/speckit.` are entered in **Pi chat**.
+- Commands such as `git`, `specify` and `python3` are entered in the **terminal**.
+
+This distinction is easy to miss when using Spec Kit for the first time.
+
+## Understand the workflow
+
+The workflow used for this application is:
+
+```text
+Constitution
+  → Specification
+  → Clarification
+  → Technical plan
+  → Tasks
+  → Analysis
+  → Implementation
+  → Tests
+  → Convergence
+  → Manual verification
+```
+
+Each stage creates or updates files inside the project. These files preserve requirements, decisions and implementation progress outside the AI conversation.
+
+My role throughout the process is to:
+
+1. Describe what I want in ordinary language.
+2. Review the generated documents.
+3. Correct assumptions and unclear decisions.
+4. Approve each stage before continuing.
+
+Spec Kit provides the repeatable structure, but I am still responsible for reviewing what it produces.
+
+## The three layers of a Spec Kit command
+
+When using Spec Kit with Pi, it helps to understand the three layers involved.
+
+### The command I enter
+
+I enter a short command in Pi chat:
+
+```text
+/speckit.specify Build a small command-line task tracker...
+```
+
+### The internal Spec Kit prompt
+
+Pi expands that command using a generated prompt file such as:
+
+```text
+.pi/prompts/speckit.specify.md
+```
+
+The expanded instructions can be long. They are instructions for the coding agent and are not something I need to memorise or reproduce manually.
+
+### The generated project artifacts
+
+The command creates durable project files such as:
+
+```text
+specs/001-cli-task-tracker/spec.md
+```
+
+Later stages read these files and use them as context.
+
+The mental model I found most useful was:
+
+> I provide the intent. Spec Kit provides the structure. Project files preserve the decisions.
+
+## Check the prerequisites
+
+Before creating the project, confirm that Spec Kit, Git and Python are available.
+
+Run these commands in the terminal:
+
+```bash
+specify version
+git --version
+python3 --version
+```
+
+This example requires Python 3.11 or newer.
+
+## Create the project directory
+
+I started with a new directory so that generated files would not become mixed with an existing project.
+
+```bash
+mkdir my-sdd-project
+cd my-sdd-project
+```
+
+Using a fresh directory also makes it easier to inspect exactly what Spec Kit creates.
+
+## Initialise Spec Kit
+
+From inside the new project directory, run:
+
+```bash
+specify init --here --integration pi --script sh
+```
+
+The options used here mean:
+
+- `--here` initialises the current directory.
+- `--integration pi` generates files for Pi.
+- `--script sh` selects shell scripts.
+
+For Spec Kit CLI `1.0.12`, the generated structure includes directories such as:
+
+```text
+.pi/
+.specify/
+```
+
+Some useful locations are:
+
+```text
+.pi/prompts/             Pi command definitions
+.specify/memory/         Project constitution
+.specify/scripts/bash/   Workflow scripts
+.specify/templates/      Artifact templates
+.specify/workflows/      Workflow configuration
+```
+
+### Verify the generated files
+
+Inspect the top-level directory:
+
+```bash
+ls -la
+```
+
+Inspect the files generated under `.specify`:
+
+```bash
+find .specify -maxdepth 3 -type f | sort
+```
+
+Inspect the Pi prompt files:
+
+```bash
+find .pi/prompts -maxdepth 1 -type f | sort
+```
+
+The available prompts should include commands such as:
+
+```text
+speckit.constitution.md
+speckit.specify.md
+speckit.clarify.md
+speckit.plan.md
+speckit.tasks.md
+speckit.analyze.md
+speckit.implement.md
+speckit.converge.md
+```
+
+These files are what allow Pi to recognise and expand the short Spec Kit commands used later.
+
+## Initialise Git
+
+I also initialised a Git repository before creating the feature artifacts:
+
+```bash
+git init -b main
+```
+
+Verify the repository:
+
+```bash
+git status --short --branch
+```
+
+Git is useful throughout the workflow because each approved stage can be committed separately. If a later stage introduces an unwanted change, the earlier decisions remain recoverable and easy to compare.
+
+## Create the project constitution
+
+The constitution contains the engineering principles that should govern every feature in the project.
+
+It is not the specification for the task tracker. Instead, it defines how the project should be designed, implemented and verified.
+
+I wanted the project to follow these principles:
+
+- Keep the design simple.
+- Avoid features outside an approved specification.
+- Provide predictable command-line behaviour.
+- Return clear and actionable errors.
+- Use test-first development.
+- Protect persisted data.
+- Write readable, typed Python.
+- Prefer standard-library runtime dependencies.
+- Require passing tests before completion.
+
+I entered the following command in Pi chat:
+
+```text
+/speckit.constitution Create a constitution for a small educational Python CLI project. Keep the design simple and avoid features not required by approved specifications. Require predictable CLI behavior, clear output, actionable errors, test-first development, safe persistence, readable typed Python, Python 3.11 or newer, standard-library runtime dependencies where possible, pytest tests, and passing tests before completion. Governance changes must be documented and semantically versioned.
+```
+
+This creates or updates:
+
+```text
+.specify/memory/constitution.md
+```
+
+### Review the constitution
+
+Open the file from the terminal:
+
+```bash
+less .specify/memory/constitution.md
+```
+
+Press `q` to exit `less`.
+
+I checked that the generated principles accurately represented the rules I wanted. A constitution affects later plans and analysis, so an unrealistic or accidental principle can create noise throughout the remaining workflow.
+
+### Remove the temporary Sync Impact Report
+
+The constitution command may add a temporary HTML comment called `Sync Impact Report` at the top of the file.
+
+After reviewing it, I asked Pi to remove only that temporary comment:
+
+```text
+Remove only the temporary Sync Impact Report HTML comment from the top of .specify/memory/constitution.md. Do not change any constitution content.
+```
+
+The important part is to make the requested edit precise so the approved constitution itself is not rewritten.
+
+## Create the first Git checkpoint
+
+First inspect the uncommitted files:
+
+```bash
+git status --short
+```
+
+Some developers have `.pi/` listed in a global Git ignore file. Check whether that applies:
+
+```bash
+git check-ignore -v .pi .pi/prompts/speckit.specify.md
+```
+
+If the Pi prompt files are ignored but should be part of the project, stage them explicitly:
+
+```bash
+git add .specify
+git add -f .pi/prompts
+```
+
+Otherwise, stage both directories normally:
+
+```bash
+git add .specify .pi/prompts
+```
+
+Create the checkpoint:
+
+```bash
+git commit -m "chore: initialize Spec Kit and adopt constitution"
+```
+
+At this point, the project has its workflow files and governing engineering principles, but no feature has been specified.
+
+## Write the feature specification
+
+The specification describes what the user needs and why.
+
+This is not yet the place to choose:
+
+- Python modules
+- Classes
+- Storage formats
+- Frameworks
+- Libraries
+- File names
+
+Those decisions belong in the technical plan.
+
+A useful feature description identifies the user, available actions, expected outcomes, important constraints and anything deliberately excluded.
+
+I entered this command in Pi chat:
+
+```text
+/speckit.specify Build a small command-line task tracker for one local user. The user can add a task with a required title, list tasks, mark a task complete, and delete a task. Each task has a stable identifier. Task data persists between runs. The list clearly distinguishes pending and completed tasks, and commands provide clear success or error messages. This version excludes accounts, synchronization, due dates, priorities, tags, editing, and network access.
+```
+
+Spec Kit creates a numbered feature directory similar to:
+
+```text
+specs/001-cli-task-tracker/
+├── spec.md
+└── checklists/
+    └── requirements.md
+```
+
+The exact number and directory name depend on the features already present in the project.
+
+### Review the specification
+
+Open the generated specification:
+
+```bash
+less specs/001-cli-task-tracker/spec.md
+```
+
+I reviewed:
+
+- User stories and priorities
+- Acceptance scenarios
+- Functional requirements
+- Edge cases
+- Success criteria
+- Assumptions
+- Features explicitly outside the scope
+
+Generated assumptions should not automatically be accepted as facts. If the specification does not reflect the intended product, this is the right time to correct it.
+
+## Clarify hidden ambiguities
+
+Even a small CLI application contains decisions that can affect its design and tests.
+
+Run the clarification stage in Pi chat:
+
+```text
+/speckit.clarify
+```
+
+Spec Kit asks targeted questions about parts of the specification that remain unclear.
+
+For a command-line task tracker, those questions might cover:
+
+- Whether duplicate task titles are allowed
+- How tasks should be ordered
+- Whether deletion requires confirmation
+- Which exit codes represent errors
+- How an unknown task identifier should be handled
+
+Depending on the question, I can:
+
+- Reply with one of the supplied options
+- Reply with `recommended`
+- Provide a short custom answer
+
+Accepted answers are added to the specification and incorporated into its requirements.
+
+Clarification matters because technical planning should not be built on top of unresolved product behaviour.
+
+### Commit the approved requirements
+
+After reviewing the updated specification:
+
+```bash
+git add specs/001-cli-task-tracker
+git commit -m "docs: specify CLI task tracker requirements"
+```
+
+## Create the technical plan
+
+Once the expected behaviour is clear, the plan describes how it will be implemented.
+
+This is the correct stage for choosing:
+
+- Programming language and version
+- Project structure
+- Storage mechanism
+- Runtime dependencies
+- Modules and responsibilities
+- Testing tools
+- Data-integrity strategy
+
+I used the following planning instruction in Pi chat:
+
+```text
+/speckit.plan Use Python 3.11 or newer with a src-based package layout. Use only the standard library at runtime: argparse for the CLI, dataclasses for the task model, pathlib and JSON for local persistence, and atomic file replacement to protect existing data. Store data under ~/.task_tracker/tasks.json. Use monotonically increasing integer identifiers that are never reused. Run the application with python -m task_tracker. Use pytest as a development-only dependency with isolated temporary test data. Keep separate focused modules for the CLI, task operations, model, and persistence.
+```
+
+Planning may generate artifacts such as:
+
+```text
+specs/001-cli-task-tracker/
+├── plan.md
+├── research.md
+├── data-model.md
+├── quickstart.md
+└── contracts/
+    └── cli.md
+```
+
+### Understand the planning artifacts
+
+| File | Purpose |
+| --- | --- |
+| `plan.md` | Records the technical context, project structure and constitution checks |
+| `research.md` | Records technical decisions, rationale and considered alternatives |
+| `data-model.md` | Defines entities, fields, validation and state changes |
+| `contracts/cli.md` | Defines user-visible commands, output and exit behaviour |
+| `quickstart.md` | Describes end-to-end verification of the finished application |
+
+Review the main plan:
+
+```bash
+less specs/001-cli-task-tracker/plan.md
+```
+
+The plan should satisfy the approved specification without introducing unnecessary features.
+
+Once approved, create another checkpoint:
+
+```bash
+git add specs/001-cli-task-tracker
+git commit -m "docs: add implementation plan"
+```
+
+## Generate dependency-ordered tasks
+
+The task stage translates the technical plan into small pieces of executable work.
+
+Because the constitution requires test-first development, I explicitly asked for tests to appear before their corresponding implementation tasks:
+
+```text
+/speckit.tasks Generate dependency-ordered tasks using strict test-first development. For each user story, create focused pytest tasks before corresponding implementation tasks. Include contract, service, persistence integration, and data-integrity failure tests where relevant. Keep tasks small, traceable, and independently verifiable.
+```
+
+This creates:
+
+```text
+specs/001-cli-task-tracker/tasks.md
+```
+
+A generated task might look like:
+
+```text
+- [ ] T010 [P] [US1] Add failing CLI tests in tests/contract/test_cli.py
+```
+
+The parts of this task mean:
+
+- `[ ]` records whether it has been completed.
+- `T010` is its sequential identifier.
+- `[P]` indicates that it can be performed in parallel where appropriate.
+- `[US1]` connects it to a user story.
+- The final path identifies the file affected by the task.
+
+Tasks are normally grouped into:
+
+1. Project setup
+2. Shared foundations
+3. One phase for each user story
+4. Final polish and cross-cutting verification
+
+## Analyse the artifacts before coding
+
+Before implementation, I ran Spec Kit’s analysis stage:
+
+```text
+/speckit.analyze
+```
+
+Analysis compares the constitution, specification, technical plan and task list without changing them.
+
+It can identify:
+
+- Ambiguous requirements
+- Duplicate or conflicting requirements
+- Differences between the specification and plan
+- Requirements that have no corresponding task
+- Terminology that changes between artifacts
+- Violations of the project constitution
+- Success criteria that cannot be tested
+
+If analysis reports a problem, I do not immediately continue to implementation.
+
+Instead, I ask Pi to propose a targeted correction, review the exact files it intends to change and approve the edit. I then run analysis again:
+
+```text
+/speckit.analyze
+```
+
+This continues until no material inconsistencies remain.
+
+I think of this as an early convergence loop for the documentation: make the specification, plan and tasks agree before asking the agent to write the application.
+
+### Commit the analysed artifacts
+
+```bash
+git add specs/001-cli-task-tracker
+git commit -m "docs: add analyzed implementation tasks"
+```
+
+## Implement the tasks
+
+The implementation stage creates the application and its tests by following `tasks.md`.
+
+I entered:
+
+```text
+/speckit.implement Execute all tasks in dependency order using the required test-first workflow. For each test phase, confirm new tests fail for the expected missing behavior before implementing. Stop and report if a required test or non-parallel task fails unexpectedly. Mark tasks complete only after their acceptance checks pass.
+```
+
+Depending on the generated plan and tasks, this stage may:
+
+- Create a virtual environment
+- Install development dependencies
+- Write an initially failing test
+- Run the test and confirm the expected failure
+- Write the minimum implementation needed to pass
+- Rerun focused tests
+- Run the complete test suite
+- Update completed checkboxes in `tasks.md`
+- Execute scenarios from `quickstart.md`
+
+Implementation can produce a large amount of output. Much of it may come from tests and package installation.
+
+If the output becomes difficult to follow, I can stop and ask Pi to explain its current stage before allowing it to continue.
+
+## Follow the test-first cycle
+
+The test-first cycle used in this project is:
+
+```text
+Write a test for one behaviour
+  → Run it
+  → Confirm it fails because the behaviour is missing
+  → Add the minimum implementation
+  → Confirm the new test passes
+  → Run the earlier tests for regressions
+```
+
+The reason for the initial failure matters.
+
+A test that fails because of a syntax error, broken import or incorrect test setup does not prove that the intended behaviour is missing. The failure should be directly connected to the behaviour the test is introducing.
+
+## Use a virtual environment
+
+Some Python installations reject global package installation with an `externally-managed-environment` message.
+
+That protection should not be bypassed for this project. Create a virtual environment instead:
+
+```bash
+python3 -m venv .venv
+```
+
+Install the project and its development dependencies:
+
+```bash
+.venv/bin/python -m pip install -e ".[dev]"
+```
+
+The project’s `.gitignore` should exclude `.venv/`.
+
+This tutorial uses POSIX-style virtual-environment paths because it was completed using shell scripts. Windows activation and executable paths will differ.
+
+## Run the tests independently
+
+Even when the coding agent reports that the tests passed, I run the complete suite myself:
+
+```bash
+.venv/bin/python -m pytest
+```
+
+The implementation is not complete until the full suite passes.
+
+Review the generated code, tests and changed task checkboxes before committing anything.
+
+## Commit the working implementation
+
+Stage only the paths that belong to the implementation:
+
+```bash
+git add .gitignore README.md pyproject.toml src tests \
+  specs/001-cli-task-tracker/tasks.md
+```
+
+Adjust this list if the implementation generated different files.
+
+Create the implementation checkpoint:
+
+```bash
+git commit -m "feat: implement CLI task tracker"
+```
+
+Using exact paths instead of `git add -A` reduces the chance of committing unrelated files.
+
+## Run final convergence
+
+Passing tests do not necessarily prove that every approved requirement was implemented. Tests only verify the behaviours they cover.
+
+The convergence stage compares the current codebase with the specification, technical plan and task list:
+
+```text
+/speckit.converge
+```
+
+Convergence can identify behaviour that is:
+
+- Missing
+- Only partially implemented
+- In conflict with the approved artifacts
+- Present even though it was not requested
+
+If it finds gaps, Spec Kit appends additional work to `tasks.md`.
+
+I then run implementation again:
+
+```text
+/speckit.implement
+```
+
+After completing the new tasks, I rerun convergence:
+
+```text
+/speckit.converge
+```
+
+The implementation and convergence stages can repeat until the result reports:
+
+```text
+✅ Converged — the implementation satisfies the spec, plan, and tasks.
+```
+
+A clean convergence run does not modify `tasks.md`.
+
+Convergence is another structured check, not a replacement for reviewing the code or running the product manually.
+
+## Run the finished task tracker
+
+I started with the help command because it does not modify stored data:
+
+```bash
+.venv/bin/python -m task_tracker --help
+```
+
+### Add a task
+
+```bash
+.venv/bin/python -m task_tracker add "Learn Spec Kit"
+```
+
+### Confirm that it persists
+
+Run the list command in a separate process:
+
+```bash
+.venv/bin/python -m task_tracker list
+```
+
+Because this is a new invocation, seeing the task confirms that it was written to persistent storage rather than held only in memory.
+
+### Complete the task
+
+Use its stable identifier:
+
+```bash
+.venv/bin/python -m task_tracker complete 1
+```
+
+List the tasks again:
+
+```bash
+.venv/bin/python -m task_tracker list
+```
+
+The output should now clearly distinguish the completed task from a pending one.
+
+### Delete the task
+
+```bash
+.venv/bin/python -m task_tracker delete 1
+```
+
+Confirm that the collection is empty:
+
+```bash
+.venv/bin/python -m task_tracker list
+```
+
+Expected output:
+
+```text
+No tasks found.
+```
+
+The application stores its real task data at:
+
+```text
+~/.task_tracker/tasks.json
+```
+
+Automated tests should use temporary directories rather than reading or overwriting this real data file.
+
+## Use Git checkpoints throughout the workflow
+
+The following checkpoint pattern kept each approved stage separate:
+
+| Stage | Example commit |
+| --- | --- |
+| Initialisation and constitution | `chore: initialize Spec Kit and adopt constitution` |
+| Specification and clarification | `docs: specify feature requirements` |
+| Technical plan | `docs: add implementation plan` |
+| Analysed task list | `docs: add analyzed implementation tasks` |
+| Working implementation | `feat: implement feature` |
+| Convergence corrections | `fix: close convergence gaps` |
+
+Before each commit, inspect the repository:
+
+```bash
+git status --short
+git diff --check
+```
+
+These checks make unexpected files and whitespace errors visible before they enter the commit.
+
+## A reusable workflow for another application
+
+The same general structure can be reused for another small project.
+
+Replace the bracketed sections with the requirements for the new product.
+
+### Constitution
+
+Enter in Pi chat:
+
+```text
+/speckit.constitution Create a constitution for [project type]. Require [simplicity rules], [user-interface quality], [testing policy], [data or security rule], and [code-quality rule]. Use [language, version and dependency constraints]. Define governance, quality gates, and completion requirements.
+```
+
+### Specification
+
+```text
+/speckit.specify Build [product] for [user]. The user can [primary action], [secondary action], and [third action]. The product must [important outcome or persistence rule]. It must clearly handle [important error cases]. This version excludes [explicitly out-of-scope features].
+```
+
+### Clarification
+
+```text
+/speckit.clarify
+```
+
+### Technical plan
+
+```text
+/speckit.plan Use [language and version] with [project layout]. Use [runtime libraries] for [responsibilities]. Store data using [storage approach]. Use [test framework] with isolated test data. Keep the design small with focused modules for [module responsibilities].
+```
+
+### Tasks
+
+```text
+/speckit.tasks Generate dependency-ordered tasks using test-first development. Put focused tests before implementation for every user story. Keep tasks small, traceable, and independently verifiable.
+```
+
+### Analysis, implementation and convergence
+
+Run these separately in Pi chat:
+
+```text
+/speckit.analyze
+```
+
+Review the result before running:
+
+```text
+/speckit.implement
+```
+
+After reviewing the implementation and running its tests:
+
+```text
+/speckit.converge
+```
+
+Do not paste all three commands into Pi at once. Each stage creates information that should be reviewed before the next stage begins.
+
+## Troubleshooting lessons
+
+Several issues are easier to understand once the different tools and files are separated.
+
+### A slash command expands into a very long prompt
+
+This is expected.
+
+Pi has loaded the workflow from a file under:
+
+```text
+.pi/prompts/
+```
+
+I only need to enter the short slash command and its natural-language argument. The expanded prompt contains the internal instructions used by the agent.
+
+### Git does not show the `.pi` directory
+
+A global Git ignore rule may be hiding it.
+
+Check with:
+
+```bash
+git check-ignore -v .pi .pi/prompts/speckit.specify.md
+```
+
+If the generated prompts should be version controlled, force-stage only that intended directory:
+
+```bash
+git add -f .pi/prompts
+```
+
+### Git reports `?? specs/`
+
+The `??` marker means that the directory is untracked. It does not mean anything is broken.
+
+Stage the intended feature directory:
+
+```bash
+git add specs/001-cli-task-tracker
+```
+
+### Python reports an externally managed environment
+
+Use a project virtual environment:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e ".[dev]"
+```
+
+Do not use `--break-system-packages` for this project.
+
+### A permission gate blocks a cleanup operation
+
+Do not automatically override the gate.
+
+Ask the agent which operation was blocked and request the exact path it intended to modify or remove. Inspect that target before deciding whether the operation should continue.
+
+### Tests pass but convergence still finds work
+
+This can happen because tests verify only the behaviours represented in the test suite.
+
+Convergence compares the implementation with the complete set of approved artifacts. A requirement can therefore be missing even when every existing test passes.
+
+Treat additional convergence tasks as normal follow-up work rather than as a contradiction.
+
+### The generated artifact contains something I disagree with
+
+Stop at the current stage and describe the problem in plain language.
+
+Ask for a targeted correction to the affected artifact. Do not continue into planning or implementation until the document reflects the intended decision.
+
+## Final project checklist
+
+Before considering the workflow complete, confirm that:
+
+- [ ] Spec Kit was initialised with the intended integration and script type.
+- [ ] Git was initialised.
+- [ ] The constitution was created, reviewed and committed.
+- [ ] The feature specification was created and reviewed.
+- [ ] Important ambiguity was clarified.
+- [ ] The approved requirements were committed.
+- [ ] The technical plan and design artifacts were reviewed.
+- [ ] Test tasks appeared before their implementation tasks.
+- [ ] Analysis was run and material findings were resolved.
+- [ ] Implementation tasks were completed.
+- [ ] The complete automated test suite passed.
+- [ ] Convergence reported no remaining gaps.
+- [ ] The finished application was run manually.
+- [ ] The final implementation was committed.
+
+## What I learned
+
+The most important lesson was that I did not need to memorise Spec Kit’s internal prompts.
+
+I only needed to describe the intent clearly, review the generated artifacts and stop when something did not make sense.
+
+The other lessons I want to carry into future projects are:
+
+1. Keep what the product does in the specification.
+2. Keep how the product works in the technical plan.
+3. Clarify important ambiguity before planning.
+4. Ask for tests before implementation when behaviour matters.
+5. Use analysis before coding and convergence after coding.
+6. Commit each approved stage so decisions remain recoverable.
+7. Run the tests and application myself instead of relying only on the agent’s report.
+8. Pause when the output becomes confusing and ask what is happening.
+
+The task tracker is small, but it exercises the complete workflow. That made it a useful way to understand how Spec Kit turns a short product idea into reviewed requirements, a technical plan, executable tasks and a verified implementation.
+
+## Further reading
+
+- [GitHub Spec Kit repository](https://github.com/github/spec-kit)
+- [Spec Kit installation guide](https://github.github.io/spec-kit/installation.html)
+- [Spec Kit agentic SDD reference](https://github.github.io/spec-kit/reference/agentic-sdd.html)

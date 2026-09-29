@@ -1,0 +1,386 @@
+---
+title: 'Understanding spec-driven development with GitHub Spec Kit'
+pubDate: 2026-09-29
+description: 'What spec-driven development means, how GitHub Spec Kit supports it, and when a specification-first workflow is useful for AI-assisted development.'
+category: 'AI and Developer Tools'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+tags:
+  - Spec-Driven Development
+  - GitHub Spec Kit
+  - AI-Assisted Development
+  - Software Engineering
+---
+
+AI coding agents can generate working code remarkably quickly. The difficult part is making sure they generate the right code.
+
+A short prompt may be enough for a small, isolated change. For a larger feature, however, important details can remain unstated: who the feature is for, how different states should behave, what is outside the scope, which constraints must be respected and how the finished work will be evaluated.
+
+Spec-driven development addresses this by defining the intended behaviour before implementation begins.
+
+GitHub Spec Kit provides a structured way to apply that approach when working with AI coding agents.
+
+## What is spec-driven development?
+
+Spec-driven development, often shortened to SDD, is an approach in which a written specification becomes the main source of intent for a feature.
+
+The specification describes what should be built and why it is needed before the team decides exactly how to implement it.
+
+A useful specification can include:
+
+- The problem being solved
+- The intended users
+- User stories and expected behaviour
+- Functional requirements
+- Important states and edge cases
+- Acceptance criteria
+- Constraints and assumptions
+- Explicitly excluded behaviour
+
+The technical plan follows from those requirements. The implementation should then follow the plan rather than being generated directly from a brief, ambiguous prompt.
+
+The basic direction is:
+
+```text
+Intent
+  → Specification
+  → Technical plan
+  → Implementation tasks
+  → Code
+  → Verification
+```
+
+This creates a visible path from the original idea to the completed implementation.
+
+## How is this different from ordinary documentation?
+
+Most software projects already contain some form of requirements, tickets or technical documentation.
+
+The difference is how actively the specification participates in development.
+
+In a more informal AI-assisted workflow, a developer might describe a feature in a chat and immediately ask the agent to build it. The conversation contains the requirements, but they may be mixed with implementation details, later corrections and unrelated discussion.
+
+In spec-driven development, the requirements become a deliberate project artifact. They can be reviewed, clarified and used to generate the technical plan and task list.
+
+The specification is therefore not just an explanation written after the code. It guides the work before and during implementation.
+
+## Separate what to build from how to build it
+
+One of the most useful ideas in spec-driven development is the separation between product intent and technical implementation.
+
+The specification should focus on questions such as:
+
+- What should the user be able to do?
+- Why is the feature needed?
+- How should the interface behave?
+- What should happen when data is missing or invalid?
+- What outcome counts as successful?
+
+The technical plan answers a different set of questions:
+
+- Which framework or libraries should be used?
+- Which components need to change?
+- How should data be stored?
+- Which API endpoints are required?
+- What tests should be added?
+- Are any migrations or architectural changes necessary?
+
+Keeping these decisions separate prevents implementation choices from quietly defining the product behaviour.
+
+It also allows the team to review the intended experience before becoming committed to a particular technical solution.
+
+## Why does AI-assisted development benefit from specifications?
+
+An AI coding agent only knows what it receives through its instructions, available files and surrounding context.
+
+When a request is underspecified, the agent must either ask questions or make assumptions. If those assumptions remain unnoticed, the resulting code can look technically reasonable while solving the wrong problem.
+
+A structured specification gives the agent more reliable context.
+
+### It reduces ambiguity
+
+A prompt such as:
+
+> Add filtering to the search page.
+
+Leaves many questions unanswered:
+
+- Which fields can be filtered?
+- Can filters be combined?
+- Should they appear in the URL?
+- What happens when no results match?
+- Are filters preserved when navigating back?
+- Is there a way to clear all filters?
+
+A specification makes those decisions visible before code is generated.
+
+### It reduces prompt drift
+
+Long AI conversations can gradually move away from the original requirement. A decision made early in the conversation may be forgotten or contradicted later.
+
+Persistent specification, plan and task files give the agent a stable set of artifacts to work from instead of relying only on conversation history.
+
+### It makes generated work reviewable
+
+Reviewing a large block of generated code without a clear statement of intent is difficult.
+
+When a specification exists, the reviewer can compare the implementation with an agreed description of the feature:
+
+- Does the code satisfy every requirement?
+- Are important states missing?
+- Has the implementation added behaviour that was not requested?
+- Do the tests reflect the acceptance criteria?
+
+The specification gives code review a reference point.
+
+### It exposes problems before implementation
+
+It is normally easier to correct an unclear requirement in a Markdown file than after it has spread across components, APIs and tests.
+
+Spec-driven development creates opportunities to find contradictions, missing cases and unclear language before implementation begins.
+
+## What is GitHub Spec Kit?
+
+GitHub Spec Kit is an open-source toolkit for applying structured development processes with AI coding agents.
+
+Its core process supports spec-driven development by turning an initial feature description into a series of connected artifacts:
+
+- A project constitution
+- A feature specification
+- A technical plan
+- An actionable task list
+- The resulting implementation
+- A convergence check against the agreed artifacts
+
+Spec Kit provides the templates and agent instructions used to move through that process. It is not itself the coding agent or the application framework.
+
+You still use an AI coding agent to inspect the project, generate the artifacts and implement the work. Spec Kit provides the workflow that guides the agent.
+
+It supports multiple coding-agent integrations, so the underlying approach is not limited to GitHub Copilot.
+
+## The core Spec Kit workflow
+
+The core workflow can be understood as five feature-level stages, supported by a project constitution.
+
+```text
+Project constitution
+
+Specify
+  → Plan
+  → Tasks
+  → Implement
+  → Converge
+```
+
+### Constitution
+
+The constitution defines the principles and non-negotiable standards for the project.
+
+These might cover:
+
+- Code quality
+- Testing expectations
+- Accessibility
+- Security
+- Performance
+- Architectural boundaries
+- User-experience consistency
+
+The constitution is normally established once for the project and updated when its governing principles change.
+
+It gives later specifications and plans a consistent set of rules to follow.
+
+### Specify
+
+The specification describes what should be built and why.
+
+This is where the feature’s user stories, requirements, expected behaviour and acceptance criteria are defined.
+
+Technical choices should generally be left for the planning stage unless they are genuine product constraints.
+
+### Plan
+
+The plan translates the specification into a technical approach.
+
+It can describe the architecture, technologies, components, data model, API changes and testing strategy required to deliver the feature.
+
+The plan should satisfy the specification while respecting the project constitution.
+
+### Tasks
+
+The task stage breaks the plan into smaller, actionable pieces of work.
+
+Tasks can be ordered by dependency so that foundational work is completed before the feature behaviour that depends on it.
+
+This gives the coding agent a clearer execution path than asking it to implement the entire feature as one large request.
+
+### Implement
+
+During implementation, the agent works through the generated tasks and modifies the codebase.
+
+The specification, plan and tasks remain available as context, helping the agent connect individual code changes to the intended outcome.
+
+Implementation can be completed in stages for larger features instead of trying to generate everything in a single pass.
+
+### Converge
+
+Convergence checks the resulting code against the specification, plan and task list.
+
+If something is missing or only partially implemented, the process can add the remaining work to the task list. The implementation and convergence stages can then repeat until no gaps are found.
+
+This does not replace human review or testing. It provides another structured check that the implementation has not drifted away from the agreed artifacts.
+
+## Optional quality gates
+
+Spec Kit also provides optional stages for features with greater ambiguity or risk.
+
+### Clarify
+
+Clarification identifies underspecified parts of the feature and asks targeted questions before planning begins.
+
+This is useful when a requirement sounds clear at first but still leaves important behavioural decisions unresolved.
+
+### Checklist
+
+A checklist evaluates the quality of the requirements themselves.
+
+It asks whether the specification is complete, consistent and clear enough to guide implementation. This is different from testing the finished code.
+
+### Analyze
+
+Analysis compares the specification, plan and tasks to find conflicts, gaps or requirements that are not represented in the implementation plan.
+
+Running this before implementation gives the team an opportunity to correct the artifacts while changes are still relatively inexpensive.
+
+These stages are not mandatory for every feature. A small, well-understood change may not require the same level of ceremony as a complex or high-risk feature.
+
+## An easy example
+
+Imagine a team wants to add a saved-search feature to an application.
+
+An initial prompt might be:
+
+> Add the ability to save a search.
+
+That is enough to express the general idea, but not enough to describe the feature reliably.
+
+A specification could establish that:
+
+- A signed-in user can save the current search term and filters.
+- Every saved search must have a name.
+- Names cannot be empty.
+- A user cannot have two saved searches with the same name.
+- Selecting a saved search restores its term and filters.
+- A saved search can be renamed or deleted.
+- An appropriate empty state appears when the user has no saved searches.
+- Saving is unavailable to signed-out users.
+- Sharing saved searches is outside the initial scope.
+
+The specification describes the behaviour without deciding how it will be implemented.
+
+The technical plan could then decide that:
+
+- A React component will display the saved searches.
+- The selected filters will be represented in the URL.
+- A new API endpoint will create and retrieve saved searches.
+- The database will enforce uniqueness per user.
+- Component and API tests will cover the acceptance criteria.
+
+The task list could divide that plan into manageable work:
+
+1. Add the saved-search data model.
+2. Add the API endpoints.
+3. Add the frontend service functions.
+4. Build the saved-search interface.
+5. Restore search state when a saved search is selected.
+6. Add empty, loading and error states.
+7. Add automated tests.
+8. Verify the implementation against the specification.
+
+The coding agent now has a much clearer definition of the feature than it received from the original one-line prompt.
+
+## What is Spec Kit useful for?
+
+Spec Kit is particularly useful when a change contains enough complexity that an informal prompt is likely to miss important details.
+
+Good candidates include:
+
+- Building a new application
+- Adding a feature with several user states
+- Making changes across the frontend, API and data layer
+- Working with important security or accessibility constraints
+- Planning a change that several people need to review
+- Breaking a large feature into smaller implementation stages
+- Using an AI agent in an existing codebase with established conventions
+
+It can also help when the person requesting the feature understands the desired outcome but has not yet decided on the implementation.
+
+Because the specification and plan are separate, product behaviour can be refined before technical decisions are made.
+
+## Can Spec Kit be used in an existing project?
+
+Spec Kit is not limited to creating new applications.
+
+For an established codebase, the project’s existing documentation, architecture, conventions and tests can provide context for the constitution and planning stages.
+
+The first specification can describe one bounded change rather than attempting to document the entire application retrospectively.
+
+For example, a team could introduce Spec Kit for one new search filter, one export feature or one piece of a gradual modernization project.
+
+Starting with a contained change makes it easier to review the generated artifacts and decide how the workflow fits the existing team.
+
+## What Spec Kit does not replace
+
+Spec Kit provides structure, but it does not remove the need for engineering judgement.
+
+The team still needs to:
+
+- Confirm that the requirements solve the right problem
+- Review the generated specification and plan
+- Challenge incorrect assumptions
+- Review the implementation
+- Run appropriate automated and exploratory tests
+- Consider security, accessibility and performance
+- Keep the artifacts aligned when requirements change
+
+A detailed specification can still be wrong. It can also create false confidence if nobody reviews it carefully.
+
+The value comes from using the artifacts to support discussion and verification, not from generating more Markdown files.
+
+## When might it be unnecessary?
+
+Not every change needs the complete workflow.
+
+A small typo, a straightforward dependency update or a clearly understood one-line fix may not benefit from a full specification, plan and task list.
+
+The amount of process should match the size and uncertainty of the work.
+
+Spec Kit includes optional quality gates partly for this reason. Teams can use a lighter path for simple work and introduce clarification, checklists and analysis when the feature carries more ambiguity or risk.
+
+## Specifications should be allowed to evolve
+
+Writing the specification first does not mean it can never change.
+
+New information may appear during design or implementation. A technical constraint may reveal that an interaction needs to be reconsidered. Testing may expose an edge case that was not originally understood.
+
+When that happens, the change should be reflected in the specification and its downstream artifacts rather than being hidden only in the code.
+
+The specification remains useful when it represents the current agreement, not merely the first version of the idea.
+
+## Bringing structure to AI-assisted development
+
+Spec-driven development changes the starting point of AI-assisted coding.
+
+Instead of beginning with “generate this feature”, it begins with understanding the feature well enough to describe its behaviour, boundaries and purpose.
+
+GitHub Spec Kit makes that approach practical by connecting the specification to planning, tasks, implementation and convergence.
+
+The result is not guaranteed to be correct simply because a specification exists. What improves is the path to correctness: assumptions become visible, decisions become reviewable and the coding agent receives more dependable context.
+
+In the next note, I will walk through setting up GitHub Spec Kit and using its workflow on a practical example.
+
+## Further reading
+
+- [GitHub Spec Kit repository](https://github.com/github/spec-kit)
+- [Spec Kit documentation](https://github.github.io/spec-kit/)
+- [Adopting Spec Kit in an existing project](https://github.github.io/spec-kit/guides/existing-projects.html)
