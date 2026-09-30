@@ -1,0 +1,590 @@
+---
+title: 'What belongs in an AI project constitution?'
+pubDate: 2026-09-30
+description: 'How to separate durable project principles from agent instructions, reusable workflows, feature specifications, architecture records, and tool configuration.'
+category: 'AI-Assisted Development'
+layout: ../../layouts/noteLayout.astro
+author: 'Vaibhav Shringarpure'
+tags:
+  - AI-Assisted Development
+  - Spec-Driven Development
+  - GitHub Spec Kit
+  - Project Governance
+  - Software Architecture
+---
+
+AI-assisted development works best when an agent understands not only what to build, but also which principles it must never compromise.
+
+That is the purpose of a project constitution: a small, durable collection of non-negotiable rules that guides specifications, technical plans, implementation, and review.
+
+However, a constitution is only one part of an effective agent-driven project. Agent instructions, reusable skills, feature specifications, architecture decision records, and tool configuration each have different responsibilities.
+
+Putting everything into the constitution makes it noisy and difficult to enforce. Spreading the same rule across several files creates contradictions and stale documentation.
+
+The goal is not to write the longest possible constitution. It is to put each rule in the correct place and maintain a single source of truth.
+
+## What is a project constitution?
+
+A project constitution defines what must remain true throughout the life of a project.
+
+It contains durable, project-wide obligations that every specification, implementation plan, and completed feature must satisfy. These are the principles you would use to reject an otherwise functional implementation because it violates an essential product or engineering requirement.
+
+Examples might include:
+
+- All user interactions must be accessible by keyboard and assistive technology.
+- User-visible behaviour must be protected by automated tests.
+- The application must remain a static site unless an approved specification changes that boundary.
+- Shared abstractions may only be introduced when multiple concrete uses justify them.
+- Every change must trace back to an approved requirement or necessary supporting work.
+
+A constitution is not simply a list of preferences. It is a decision-making framework.
+
+## What a constitution is not
+
+A constitution should not become a dumping ground for every instruction an AI agent might need.
+
+It should not contain:
+
+- A complete list of development commands
+- Detailed repository navigation instructions
+- The full procedure for test-driven development
+- Step-by-step debugging methods
+- Requirements that apply to only one feature
+- Formatting settings already enforced by tooling
+- Package versions copied from a dependency manifest
+- Long explanations of established workflows
+
+Those details belong elsewhere.
+
+The constitution should state the required outcome. Other documents and tools should explain or enforce how that outcome is achieved.
+
+## Separate the layers of project guidance
+
+A useful project separates guidance into several layers:
+
+| Location | Responsibility |
+| --- | --- |
+| Project constitution | Durable, project-specific, non-negotiable rules |
+| Agent instructions | How agents should operate in the repository |
+| Skills or workflows | Reusable procedures for a particular type of task |
+| Feature specifications | What one feature must do |
+| Architecture decision records | Important technical decisions and their rationale |
+| Configuration files | Rules that tools can enforce automatically |
+
+Understanding these boundaries prevents duplication and makes the instructions easier for both humans and agents to follow.
+
+### Project constitution
+
+The constitution answers:
+
+> What must remain true regardless of which feature we are building?
+
+It should contain product qualities, architectural boundaries, quality expectations, and governance rules.
+
+### Agent instructions
+
+A repository-level agent instruction file answers:
+
+> How should an agent work in this repository?
+
+It can include:
+
+- The command used to run the complete validation suite
+- Where specifications and architecture records live
+- Which documents must be read before planning or implementation
+- Repository-specific workflow conventions
+- Pointers to the constitution and other authoritative documents
+
+Agent instructions should point to the constitution instead of duplicating it.
+
+### Skills and workflows
+
+A skill or reusable workflow answers:
+
+> How should this type of work be performed?
+
+Examples include:
+
+- Practising test-driven development
+- Diagnosing a difficult bug
+- Reviewing a branch
+- Writing a specification
+- Breaking work into tickets
+- Modelling domain concepts
+
+Skills are procedural and can often be reused across projects. A constitution may require an outcome, such as test-first development or specification compliance, without reproducing the complete procedure.
+
+### Feature specifications
+
+A feature specification answers:
+
+> What must this particular feature do?
+
+For example:
+
+> Selecting a service opens a dialog containing that service's title and description.
+
+That requirement belongs in the feature specification because it does not apply to every feature in the project.
+
+### Architecture decision records
+
+An architecture decision record, or ADR, answers:
+
+> What significant decision did we make, why did we make it, and which alternatives did we reject?
+
+The constitution may establish an architectural boundary, while an ADR records a particular decision made within that boundary.
+
+### Configuration files
+
+Configuration answers:
+
+> What can our tools verify automatically?
+
+Examples include:
+
+- Strict type checking
+- Formatting rules
+- Linting rules
+- Test commands
+- Build commands
+- Dependency versions
+
+Documentation should not unnecessarily repeat information that an agent can reliably discover from the project itself.
+
+## Test whether a rule belongs in the constitution
+
+A rule is a good candidate for the constitution when most of the following statements are true:
+
+1. It applies to nearly every feature in the project.
+2. Violating it would make the result unacceptable.
+3. It should survive changes to individual specifications.
+4. It affects planning, architecture, or product quality.
+5. Compliance can be checked.
+6. An exception would require explicit justification.
+
+Consider this rule:
+
+> Every modal must be keyboard operable, contain focus while open, and restore focus to the control that opened it.
+
+If accessible modal behaviour is fundamental to the product, this is a strong constitutional rule. It affects dependency choices, implementation planning, and testing requirements.
+
+Now consider:
+
+> Run `npm run check` before completing a task.
+
+This is an operational instruction, so it usually belongs in the repository's agent instructions.
+
+The constitution can state the higher-level obligation:
+
+> Formatting, static analysis, automated tests, and the production build must pass before implementation is considered complete.
+
+The agent instruction file can then name the command that performs those checks.
+
+## How to write a useful project constitution
+
+### 1. Collect candidate rules
+
+Start by listing possible rules from all available sources:
+
+- Existing agent instructions
+- Team standards
+- Reusable workflows
+- Product requirements
+- Technology decisions
+- Previous project failures
+- Existing specifications
+- Architecture records
+- Regulatory or accessibility obligations
+
+At this stage, collect freely. Do not copy everything directly into the constitution.
+
+Possible candidates might include:
+
+- Use strict TypeScript.
+- Follow test-driven development.
+- Prefer the smallest sufficient implementation.
+- Use established accessible interface primitives.
+- Run linting and tests before completion.
+- Avoid speculative abstractions.
+- Begin features with acceptance criteria.
+- Keep the application client-side only.
+- Restore focus after closing a dialog.
+- Review every change against its specification.
+
+The following steps determine where each candidate belongs.
+
+### 2. Classify each rule
+
+Ask a small set of questions about every candidate.
+
+#### Is the rule feature-specific?
+
+Put it in the feature specification.
+
+For example:
+
+> The contact button opens the visitor's default email application.
+
+#### Is it a reusable procedure?
+
+Put it in a skill or workflow.
+
+Examples include:
+
+- How to follow red-green-refactor
+- How to diagnose an intermittent failure
+- How to review a change against coding standards
+
+#### Is it a repository instruction or lookup?
+
+Put it in the agent instruction file.
+
+For example:
+
+- Run `npm run check` for full validation.
+- Specifications live under `specs/`.
+- Read the constitution before technical planning.
+
+#### Can tooling enforce it directly?
+
+Put the enforcement in configuration.
+
+For example:
+
+- TypeScript strictness belongs in `tsconfig.json`.
+- Formatting rules belong in the formatter configuration.
+- Linting rules belong in the linter configuration.
+
+The constitution may preserve the important principle, but it should not reproduce the complete configuration.
+
+#### Is it a durable, project-wide obligation?
+
+Put it in the constitution.
+
+For example:
+
+- Accessibility is a release requirement.
+- Tests must protect user-observable behaviour.
+- The product must not acquire a backend without an approved specification.
+- Custom focus management requires written justification and equivalent automated coverage.
+
+### 3. Choose a small set of core principles
+
+A constitution should be memorable. For a focused project, three to seven principles will often be enough.
+
+Each principle should have:
+
+1. A clear name
+2. A precise obligation
+3. The decisions it constrains
+4. A way to verify compliance
+
+Possible principles include:
+
+- Accessibility is non-negotiable.
+- Interaction quality is product quality.
+- Prefer simplicity over speculation.
+- Test user-observable behaviour.
+- Apply security by default.
+- Build responsive and performant interfaces by default.
+- Make every change traceable to a requirement.
+
+Avoid vague statements such as:
+
+> Code should be high quality.
+
+Prefer a rule that changes behaviour:
+
+> Components must have focused responsibilities. Shared abstractions must only be introduced after multiple concrete uses demonstrate the same underlying behaviour.
+
+The second version gives an agent and reviewer something specific to apply.
+
+### 4. Use precise language
+
+Constitutional rules should distinguish obligations from preferences.
+
+| Term       | Meaning                                                |
+| ---------- | ------------------------------------------------------ |
+| `MUST`     | The rule is required.                                  |
+| `MUST NOT` | The behaviour is prohibited.                           |
+| `SHOULD`   | The rule is expected unless an exception is justified. |
+| `MAY`      | The behaviour is permitted but not required.           |
+
+Use these terms deliberately.
+
+If every sentence says `MUST`, the constitution may become unnecessarily rigid. If every sentence says `SHOULD`, it may fail to constrain decisions.
+
+A useful test is:
+
+> Would I stop or reject an implementation because it violates this sentence?
+
+If the answer is no, it may not be a genuine constitutional requirement.
+
+### 5. Add technical and scope constraints
+
+After the core principles, document any durable technical boundaries.
+
+This section can answer:
+
+- Which technology choices are fixed?
+- Which architectural boundaries are fixed?
+- What is intentionally outside the project's scope?
+- Which implementation approaches are required or preferred?
+- Which choices require written justification?
+
+For example:
+
+- The application must use React and strict TypeScript.
+- The initial product must remain a static single-page application.
+- Contact must remain a direct-contact action unless a later specification requires server-side processing.
+- An established accessible dialog primitive should be preferred over custom focus-management code.
+- Adding a backend, CMS, or generalised framework requires an approved specification demonstrating the need.
+
+Avoid including dependency versions here. Versions belong in the project's package or dependency manifest.
+
+### 6. Define quality gates
+
+Principles are most effective when they produce observable checks.
+
+A quality-gate section might require:
+
+- Formatting passes.
+- Static analysis passes without warnings.
+- Type checking passes.
+- Automated tests pass.
+- Browser-level tests pass where browser behaviour matters.
+- Accessibility checks pass.
+- The production build succeeds.
+- Keyboard-only operation is manually reviewed.
+- Reduced-motion behaviour is reviewed.
+- Relevant mobile viewports are reviewed.
+
+A quality gate should describe the required evidence.
+
+The repository's agent instructions or package scripts should identify the exact commands used to obtain that evidence.
+
+### 7. Decide whether test-first development is mandatory
+
+Requiring tests and requiring test-first development are different policies.
+
+A constitution that says:
+
+> User-visible behaviour must be protected by automated tests.
+
+requires test coverage, but it does not require the tests to be written first.
+
+If test-first development is genuinely non-negotiable, say so explicitly:
+
+> Behavioural changes must begin with a failing test that demonstrates the required outcome. Implementation begins only after the test fails for the expected reason.
+
+Only make this constitutional if you intend to apply it consistently.
+
+If exceptions are common, keep test-first development as a preferred workflow rather than a constitutional obligation.
+
+### 8. Add governance
+
+Governance explains how the constitution itself is managed.
+
+It should define:
+
+- When compliance is checked
+- How exceptions are documented
+- How amendments are approved
+- How version numbers change
+- Which project documents take precedence when rules conflict
+
+For example:
+
+> Within project documentation, this constitution supersedes conflicting specifications, plans, and local conventions. Every technical plan and implementation review must verify constitution compliance. Any exception must document its reason, cost, and rejected simpler alternative before implementation begins.
+
+A semantic versioning model can help communicate the impact of amendments:
+
+- **Major:** Removes or fundamentally redefines an existing obligation
+- **Minor:** Adds or materially expands a principle
+- **Patch:** Clarifies wording without changing the obligation
+
+The constitution governs project documentation and decisions. It does not override system-level instructions, security policies, legal requirements, or explicit direction from the project owner.
+
+### 9. Keep one source of truth
+
+Do not copy the constitution into the agent instruction file. Add a short pointer instead:
+
+```markdown
+## Project constitution
+
+Project-wide non-negotiable requirements are defined in `.specify/memory/constitution.md`.
+
+Read the constitution before creating or changing specifications, implementation plans, tasks, architecture, or user-facing behaviour.
+
+Plans and reviews must include an explicit constitution compliance check.
+```
+
+Likewise, do not paste complete development workflows into the constitution. Reference or invoke the appropriate skill when that procedure is required.
+
+Duplication creates three problems:
+
+1. Rules become inconsistent.
+2. Nobody knows which copy is authoritative.
+3. Outdated instructions remain in an agent's context.
+
+A short pointer is usually more reliable than a second copy.
+
+### 10. Test the constitution against real decisions
+
+For every principle, ask:
+
+1. Would this rule change a technical plan?
+2. Could a reviewer determine whether it was followed?
+3. Could it reject an otherwise functional implementation?
+4. Does it apply beyond one feature?
+5. Would removing it materially change the project?
+
+If the answer is no to most of these questions, the rule probably belongs somewhere else—or does not need to be written at all.
+
+You can also test the constitution against hypothetical proposals:
+
+- Would it reject an inaccessible custom dialog?
+- Would it prevent an unnecessary backend?
+- Would it require tests for focus restoration?
+- Would it expose an unjustified abstraction?
+- Would it require a plan to address mobile behaviour?
+
+If the constitution cannot influence these decisions, its wording may be too vague.
+
+## A practical constitution structure
+
+A concise constitution can follow this shape:
+
+```markdown
+# Project Constitution
+
+## Core Principles
+
+### I. Accessibility Is Non-Negotiable
+
+[Project-wide accessibility obligations]
+
+### II. Simplicity Over Speculation
+
+[Rules preventing unnecessary scope and abstractions]
+
+### III. Test User-Observable Behaviour
+
+[Testing obligations and required levels of evidence]
+
+### IV. Responsive and Performant by Default
+
+[Viewport, performance, and interaction requirements]
+
+## Technical and Scope Constraints
+
+[Fixed stack, architectural boundaries, and explicit exclusions]
+
+## Development Workflow and Quality Gates
+
+[Planning gates, validation outcomes, and review requirements]
+
+## Governance
+
+[Precedence, exceptions, amendments, and versioning]
+
+**Version**: 1.0.0 **Ratified**: YYYY-MM-DD **Last Amended**: YYYY-MM-DD
+```
+
+The exact headings are less important than keeping the document focused on durable obligations.
+
+## A complementary agent instruction file
+
+The repository's agent instructions can remain short and operational:
+
+```markdown
+# Repository Instructions
+
+## Project constitution
+
+Read `.specify/memory/constitution.md` before specification, planning, architecture, implementation, or review work. It defines the project's non-negotiable requirements.
+
+## Validation
+
+Run the complete validation suite with:
+
+`npm run check`
+
+Work is incomplete until this command passes.
+
+## Specifications
+
+Feature specifications and plans live under `specs/`.
+
+## Working practices
+
+Use the relevant workflow for test-driven development, difficult bug investigation, code review, or domain modelling. Workflows define the procedure; the constitution defines the required project outcomes.
+```
+
+This file tells the agent where to look and how to operate without repeating the constitution.
+
+## Common mistakes to avoid
+
+### Copying generic standards into every constitution
+
+A personal standard should only become constitutional when it genuinely applies to the project and you are willing to enforce it.
+
+“Prefer clean code” is not useful.
+
+“All state-changing user actions must have automated behavioural coverage” is something a team can apply and verify.
+
+### Making the constitution too detailed
+
+A long constitution weakens attention.
+
+Move feature-specific rules, procedural instructions, and mechanically discoverable information to their proper locations.
+
+### Describing values without defining enforcement
+
+“Accessibility matters” is weaker than defining requirements for:
+
+- Keyboard operation
+- Focus behaviour
+- Semantic structure
+- Colour contrast
+- Reduced-motion behaviour
+- Automated and manual accessibility checks
+
+A principle should change implementation and review decisions.
+
+### Confusing tests with test-driven development
+
+If test-first implementation is required, state it explicitly.
+
+Otherwise, require appropriate test coverage without claiming a stricter process than the project actually follows.
+
+### Repeating tool configuration in prose
+
+Let the compiler, linter, formatter, and test runner enforce detailed mechanical rules.
+
+Document the architectural reason or project-level invariant only when it matters.
+
+### Allowing silent exceptions
+
+If a principle can be ignored without explanation, it is not genuinely constitutional.
+
+Require exceptions to be explicit, justified, and reviewed before implementation begins.
+
+## Remember the boundaries
+
+The simplest way to remember where each type of guidance belongs is:
+
+| Project guidance | The question it answers |
+| --- | --- |
+| Constitution | What must remain true? |
+| Agent instructions | How should agents work in this repository? |
+| Skills and workflows | How should this type of task be performed? |
+| Feature specifications | What must this feature do? |
+| Architecture decision records | Why was this significant technical decision made? |
+| Configuration files | Which mechanical rules can tools enforce? |
+
+A strong project constitution is not long for the sake of being comprehensive.
+
+It is short enough to remain visible, specific enough to change decisions, and strict enough to protect the qualities that define the project.
+
+Write it before planning begins, check it while plans are created, and use it again during implementation review. That is how a constitution becomes an active engineering tool rather than another document that quietly goes stale.
